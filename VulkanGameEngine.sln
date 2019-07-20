@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29020.237
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanRenderingEngine", "VulkanRenderingEngine\VulkanRenderingEngine.vcxproj", "{E3847DAD-B798-44A7-B764-8E09202277AC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanTestGame", "VulkanTestGame\VulkanTestGame.vcxproj", "{ECDB2317-8DDD-4107-B98B-75107344E572}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E3847DAD-B798-44A7-B764-8E09202277AC} = {E3847DAD-B798-44A7-B764-8E09202277AC}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E3847DAD-B798-44A7-B764-8E09202277AC}.Debug|x64.ActiveCfg = Debug|x64
+		{E3847DAD-B798-44A7-B764-8E09202277AC}.Debug|x64.Build.0 = Debug|x64
+		{E3847DAD-B798-44A7-B764-8E09202277AC}.Release|x64.ActiveCfg = Release|x64
+		{E3847DAD-B798-44A7-B764-8E09202277AC}.Release|x64.Build.0 = Release|x64
+		{ECDB2317-8DDD-4107-B98B-75107344E572}.Debug|x64.ActiveCfg = Debug|x64
+		{ECDB2317-8DDD-4107-B98B-75107344E572}.Debug|x64.Build.0 = Debug|x64
+		{ECDB2317-8DDD-4107-B98B-75107344E572}.Release|x64.ActiveCfg = Release|x64
+		{ECDB2317-8DDD-4107-B98B-75107344E572}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5A5F8DA-2AC6-438C-B2BE-ED70AC91A949}
+	EndGlobalSection
+EndGlobal
