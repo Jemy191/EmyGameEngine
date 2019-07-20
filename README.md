@@ -2,7 +2,6 @@
 
 ## Third party
 Vulkan
-FreeImage
 GLFW
 GLM
 stb_image
