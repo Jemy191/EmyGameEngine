@@ -9,6 +9,12 @@
 
 class Mesh
 {
+public:
+	enum MeshFormat
+	{
+		OBJ,
+		GLTF
+	};
 private:
 	static const std::string PATH;
 
@@ -23,12 +29,14 @@ private:
 	VkDeviceMemory indexBufferMemory;
 
 public:
-	Mesh(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicQueue, std::string meshName);
+	Mesh(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicQueue, std::string meshName, MeshFormat meshFormat, bool isGltfBinary = true);
 	~Mesh();
 
 	void CmdBind(VkCommandBuffer commandBuffer);
 	void CmdDraw(VkCommandBuffer commandBuffer);
 
 private:
+	void GltfLoader(std::string& meshPath, bool isGltfBinary);
+	void ObjLoader(std::string& meshPath);
 
 };

@@ -11,6 +11,7 @@ int main()
 int WinMain()
 #endif
 {
+
 	try
 	{
 		GlfwManager glfwManager = GlfwManager(800, 600, "TestGame");

@@ -47,7 +47,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 
 	chaletTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "chalet.jpg"));
 
-	chaletMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "chalet.obj"));
+	chaletMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "chalet.obj", Mesh::MeshFormat::OBJ));
 
 	descriptor = std::unique_ptr<VulkanDescriptor>(new VulkanDescriptor(logicalDevice->GetVKDevice(), swapChain->GetVkImages().size(), swapChain->GetUniformBuffers(), graphicPipeline.layoutBinding.GetVkDescriptorSetLayout(), chaletTexture.get()));
 
