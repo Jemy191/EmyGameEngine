@@ -78,7 +78,7 @@ void Mesh::GltfLoader(std::string& meshPath, bool isGltfBinary)
 
 	bool ret;
 
-	if(isGltfBinary)
+	if (isGltfBinary)
 		ret = loader.LoadBinaryFromFile(&model, &err, &warn, meshPath);
 	else
 		ret = loader.LoadASCIIFromFile(&model, &err, &warn, meshPath);
@@ -86,7 +86,7 @@ void Mesh::GltfLoader(std::string& meshPath, bool isGltfBinary)
 	if (!warn.empty())
 		throw std::runtime_error("Warn: " + warn);
 	if (!err.empty())
-		throw std::runtime_error("Err: "+ err);
+		throw std::runtime_error("Err: " + err);
 	if (!ret)
 		throw std::runtime_error("Failed to parse glTF");
 
@@ -119,12 +119,25 @@ void Mesh::ObjLoader(std::string& meshPath)
 				attrib.vertices[3 * index.vertex_index + 2]
 			};
 
-			vertex.texCoord = {
-				attrib.texcoords[2 * index.texcoord_index + 0],
-				1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+			vertex.normal = {
+				attrib.normals[3 * index.normal_index + 0],
+				attrib.normals[3 * index.normal_index + 1],
+				attrib.normals[3 * index.normal_index + 2]
 			};
 
+			if (attrib.texcoords.size() <= 0)
+				vertex.texCoord = {0.0f, 1.0f};
+			else
+			{
+				vertex.texCoord = {
+					attrib.texcoords[2 * index.texcoord_index + 0],
+					1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+				};
+			}
+
+			// No vertex color
 			vertex.color = {1.0f, 1.0f, 1.0f};
+
 
 			if (uniqueVertices.count(vertex) == 0)
 			{

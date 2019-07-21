@@ -40,16 +40,18 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	vertexShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT));
 	fragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
 
-	graphicPipeline.AddShader(vertexShader.get());
-	graphicPipeline.AddShader(fragShader.get());
+	graphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
 
-	graphicPipeline.Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+	graphicPipeline->AddShader(vertexShader.get());
+	graphicPipeline->AddShader(fragShader.get());
 
-	chaletTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "chalet.jpg"));
+	graphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 
-	chaletMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "chalet.obj", Mesh::MeshFormat::OBJ));
+	chaletTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Checker.jpg"));
 
-	descriptor = std::unique_ptr<VulkanDescriptor>(new VulkanDescriptor(logicalDevice->GetVKDevice(), swapChain->GetVkImages().size(), swapChain->GetUniformBuffers(), graphicPipeline.layoutBinding.GetVkDescriptorSetLayout(), chaletTexture.get()));
+	chaletMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "CubeSuzaneConeSphere.obj", Mesh::MeshFormat::OBJ));
+
+	descriptor = std::unique_ptr<VulkanDescriptor>(new VulkanDescriptor(logicalDevice->GetVKDevice(), swapChain->GetVkImages().size(), swapChain->GetUniformBuffers(), graphicPipeline->layoutBinding.GetVkDescriptorSetLayout(), chaletTexture.get()));
 
 	CreateCommandBuffer();
 
@@ -83,15 +85,26 @@ VulkanManager::~VulkanManager()
 
 void VulkanManager::RecreateSwapChain()
 {
+	int width = 0, height = 0;
+	while (width == 0 || height == 0)
+	{
+		glfwGetFramebufferSize(window, &width, &height);
+		glfwWaitEvents();
+	}
+
+	vkDeviceWaitIdle(logicalDevice->GetVKDevice());
+
 	renderPass.reset(new VulkanRenderPass(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample()));
-	graphicPipeline = VulkanGraphicPipeline();
 	swapChain.reset(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), commandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
-	descriptor.reset(new VulkanDescriptor(logicalDevice->GetVKDevice(), swapChain->GetVkImages().size(), swapChain->GetUniformBuffers(), graphicPipeline.layoutBinding.GetVkDescriptorSetLayout(), chaletTexture.get()));
 
-	graphicPipeline.AddShader(vertexShader.get());
-	graphicPipeline.AddShader(fragShader.get());
+	graphicPipeline.reset(new VulkanGraphicPipeline());
 
-	graphicPipeline.Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+	graphicPipeline->AddShader(vertexShader.get());
+	graphicPipeline->AddShader(fragShader.get());
+
+	graphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+
+	descriptor.reset(new VulkanDescriptor(logicalDevice->GetVKDevice(), swapChain->GetVkImages().size(), swapChain->GetUniformBuffers(), graphicPipeline->layoutBinding.GetVkDescriptorSetLayout(), chaletTexture.get()));
 
 	vkFreeCommandBuffers(logicalDevice->GetVKDevice(), commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 	CreateCommandBuffer();
@@ -224,10 +237,10 @@ void VulkanManager::CreateCommandBuffer()
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		// Shader
-		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicPipeline.GetVkPipeline());
+		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicPipeline->GetVkPipeline());
 
 		chaletMesh->CmdBind(commandBuffers[i]);
-		descriptor->CmdBind(commandBuffers[i], graphicPipeline.GetVkPipelineLayout(), i);
+		descriptor->CmdBind(commandBuffers[i], graphicPipeline->GetVkPipelineLayout(), i);
 		chaletMesh->CmdDraw(commandBuffers[i]);
 
 		vkCmdEndRenderPass(commandBuffers[i]);
@@ -272,8 +285,9 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 
 	VulkanHelper::UniformBufferObject ubo = {};
 	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.1f, 10.0f);
+	ubo.view = glm::lookAt(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.0001f, 100000.0f);
+	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	ubo.proj[1][1] *= -1;
 
 	void* data;

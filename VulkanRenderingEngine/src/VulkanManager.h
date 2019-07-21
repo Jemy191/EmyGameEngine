@@ -36,7 +36,7 @@ private:
 	//TODO: Change this so we can have multiple and take ref in mesh
 	std::unique_ptr<VulkanShader> vertexShader;
 	std::unique_ptr<VulkanShader> fragShader;
-	VulkanGraphicPipeline graphicPipeline;
+	std::unique_ptr <VulkanGraphicPipeline> graphicPipeline;
 
 	//TODO: Move this
 	VkCommandPool commandPool;
