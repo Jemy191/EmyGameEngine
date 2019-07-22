@@ -132,17 +132,6 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysical
 			throw std::runtime_error("failed to create framebuffer!");
 		}
 	}
-
-	// Uniform buffer
-	VkDeviceSize bufferSize = sizeof(VulkanHelper::UniformBufferObject);
-
-	uniformBuffers.resize(swapChainImages.size());
-	uniformBuffersMemory.resize(swapChainImages.size());
-
-	for (size_t i = 0; i < swapChainImages.size(); i++)
-	{
-		VulkanHelper::CreateBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
-	}
 }
 
 VulkanSwapChain::~VulkanSwapChain()
@@ -167,12 +156,6 @@ VulkanSwapChain::~VulkanSwapChain()
 
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-	for (size_t i = 0; i < swapChainImages.size(); i++)
-	{
-		vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-		vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-	}
-
 	std::cout << "Swap chain destroyed" << std::endl;
 }
 
@@ -186,11 +169,6 @@ std::vector<VkImage> VulkanSwapChain::GetVkImages() const
 	return swapChainImages;
 }
 
-std::vector<VkBuffer> VulkanSwapChain::GetUniformBuffers() const
-{
-	return uniformBuffers;
-}
-
 std::vector<VkImageView> VulkanSwapChain::GetVkImageViews() const
 {
 	return swapChainImageViews;
@@ -199,11 +177,6 @@ std::vector<VkImageView> VulkanSwapChain::GetVkImageViews() const
 std::vector<VkFramebuffer> VulkanSwapChain::GetSwapChainFramebuffers() const
 {
 	return swapChainFramebuffers;
-}
-
-std::vector<VkDeviceMemory> VulkanSwapChain::GetUniformBuffersMemory() const
-{
-	return uniformBuffersMemory;
 }
 
 VkFormat VulkanSwapChain::GetSwapChainImageFormat() const

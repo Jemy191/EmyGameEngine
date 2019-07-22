@@ -2,11 +2,10 @@
 #include <iostream>
 
 #include "VulkanHelper.h"
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <chrono>
+#include <algorithm>
 
 VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggestedMsaaSamples)
 {
@@ -40,18 +39,26 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	vertexShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT));
 	fragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
 
-	graphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
+	basicGraphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
 
-	graphicPipeline->AddShader(vertexShader.get());
-	graphicPipeline->AddShader(fragShader.get());
+	basicGraphicPipeline->AddShader(vertexShader.get());
+	basicGraphicPipeline->AddShader(fragShader.get());
 
-	graphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+	basicGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 
-	chaletTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Checker.jpg"));
+	checkerTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Checker.jpg"));
+	debugTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Debug.jpg"));
 
-	chaletMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "CubeSuzaneConeSphere.obj", Mesh::MeshFormat::OBJ));
+	textMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "CubeSuzaneConeSphere.obj", Mesh::MeshFormat::OBJ));
+	cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Cube.obj", Mesh::MeshFormat::OBJ));
 
-	descriptor = std::unique_ptr<VulkanDescriptor>(new VulkanDescriptor(logicalDevice->GetVKDevice(), swapChain->GetVkImages().size(), swapChain->GetUniformBuffers(), graphicPipeline->layoutBinding.GetVkDescriptorSetLayout(), chaletTexture.get()));
+	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), checkerTexture.get(), basicGraphicPipeline.get());
+	testModel->position = glm::vec3(0.0);
+	AddModelToList(testModel);
+
+	Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), basicGraphicPipeline.get());
+	cubeModel->position = glm::vec3(3, 0, 0);
+	AddModelToList(cubeModel);
 
 	CreateCommandBuffer();
 
@@ -62,9 +69,9 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 
 VulkanManager::~VulkanManager()
 {
-	chaletMesh.reset();
+	textMesh.reset();
 	swapChain.reset();
-	descriptor.reset();
+	modelList.clear();
 	vkDestroySurfaceKHR(vulkanInstance->GetInstance(), surface, nullptr);
 	vertexShader.reset();
 	fragShader.reset();
@@ -97,14 +104,37 @@ void VulkanManager::RecreateSwapChain()
 	renderPass.reset(new VulkanRenderPass(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample()));
 	swapChain.reset(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), commandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
 
-	graphicPipeline.reset(new VulkanGraphicPipeline());
+	basicGraphicPipeline.reset(new VulkanGraphicPipeline());
 
-	graphicPipeline->AddShader(vertexShader.get());
-	graphicPipeline->AddShader(fragShader.get());
+	basicGraphicPipeline->AddShader(vertexShader.get());
+	basicGraphicPipeline->AddShader(fragShader.get());
 
-	graphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+	basicGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 
-	descriptor.reset(new VulkanDescriptor(logicalDevice->GetVKDevice(), swapChain->GetVkImages().size(), swapChain->GetUniformBuffers(), graphicPipeline->layoutBinding.GetVkDescriptorSetLayout(), chaletTexture.get()));
+	//TODO: make a function for that
+	// Recreate stuff in model
+	auto graphicPipelineIterator = modelList.begin();
+
+	while (graphicPipelineIterator != modelList.end())
+	{
+		auto meshIterator = graphicPipelineIterator->second.begin();
+
+		while (meshIterator != graphicPipelineIterator->second.end())
+		{
+			auto modelIterator = meshIterator->second.begin();
+
+			while (modelIterator != meshIterator->second.end())
+			{
+				modelIterator->get()->Recreate(swapChain->GetVkImages().size());
+
+				modelIterator++;
+			}
+
+			meshIterator++;
+		}
+
+		graphicPipelineIterator++;
+	}
 
 	vkFreeCommandBuffers(logicalDevice->GetVKDevice(), commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 	CreateCommandBuffer();
@@ -112,6 +142,8 @@ void VulkanManager::RecreateSwapChain()
 
 void VulkanManager::Draw(GlfwManager* window)
 {
+	isDrawing = true;
+
 	vkWaitForFences(logicalDevice->GetVKDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 	uint32_t imageIndex;
@@ -177,6 +209,42 @@ void VulkanManager::Draw(GlfwManager* window)
 	}
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+
+	isDrawing = false;
+}
+
+void VulkanManager::AddModelToList(Model* model)
+{
+	using namespace std;
+	if (modelList.count(model->graphicPipeline) == 0)
+	{
+		modelList.insert(pair<VulkanGraphicPipeline*, map<Mesh*, vector<unique_ptr<Model>>>>(
+			model->graphicPipeline, map<Mesh*, vector<unique_ptr<Model>>>()
+			));
+	}
+	
+	if (modelList[model->graphicPipeline].count(model->mesh) == 0)
+	{
+		modelList[model->graphicPipeline].insert(pair<Mesh*, vector<unique_ptr<Model>>>(
+			model->mesh, vector<unique_ptr<Model>>()
+			));
+	}
+
+	modelList[model->graphicPipeline][model->mesh].push_back(unique_ptr<Model>(model));
+}
+
+void VulkanManager::RemoveModelFromList(Model* model)
+{
+	auto it = std::find(modelList[model->graphicPipeline][model->mesh].begin(), modelList[model->graphicPipeline][model->mesh].end(), std::unique_ptr<Model>(model));
+
+	if (it != modelList[model->graphicPipeline][model->mesh].end())
+		modelList[model->graphicPipeline][model->mesh].erase(it);
+
+	if (modelList[model->graphicPipeline][model->mesh].size() <= 0)
+		modelList[model->graphicPipeline].erase(model->mesh);
+
+	if (modelList[model->graphicPipeline].size() <= 0)
+		modelList.erase(model->graphicPipeline);
 }
 
 VulkanInstance* VulkanManager::GetVulkanInstance()
@@ -228,7 +296,7 @@ void VulkanManager::CreateCommandBuffer()
 		renderPassInfo.renderArea.extent = swapChain->GetVkExtent2D();
 
 		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+		clearValues[0].color = {clearColor.r, clearColor.g, clearColor.b, 1.0f};
 		clearValues[1].depthStencil = {1.0f, 0};
 
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -236,12 +304,34 @@ void VulkanManager::CreateCommandBuffer()
 
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		// Shader
-		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicPipeline->GetVkPipeline());
+		//TODO: make a function for that
+		// Draw model
+		auto graphicPipelineIterator = modelList.begin();
 
-		chaletMesh->CmdBind(commandBuffers[i]);
-		descriptor->CmdBind(commandBuffers[i], graphicPipeline->GetVkPipelineLayout(), i);
-		chaletMesh->CmdDraw(commandBuffers[i]);
+		while (graphicPipelineIterator != modelList.end())
+		{
+			auto meshIterator = graphicPipelineIterator->second.begin();
+
+			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicPipelineIterator->first->GetVkPipeline());
+			
+			while (meshIterator != graphicPipelineIterator->second.end())
+			{
+				auto modelIterator = meshIterator->second.begin();
+
+				meshIterator->first->CmdBind(commandBuffers[i]);
+
+				while (modelIterator != meshIterator->second.end())
+				{
+					modelIterator->get()->Draw(commandBuffers[i], i);
+
+					modelIterator++;
+				}
+
+				meshIterator++;
+			}
+
+			graphicPipelineIterator++;
+		}
 
 		vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -284,14 +374,35 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 	VulkanHelper::UniformBufferObject ubo = {};
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.view = glm::lookAt(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.0001f, 100000.0f);
-	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	ubo.proj[1][1] *= -1;
 
-	void* data;
-	vkMapMemory(logicalDevice->GetVKDevice(), swapChain->GetUniformBuffersMemory()[currentImage], 0, sizeof(ubo), 0, &data);
-	memcpy(data, &ubo, sizeof(ubo));
-	vkUnmapMemory(logicalDevice->GetVKDevice(), swapChain->GetUniformBuffersMemory()[currentImage]);
+	//TODO: make a function for that
+	// Recreate stuff in model
+	auto graphicPipelineIterator = modelList.begin();
+
+	while (graphicPipelineIterator != modelList.end())
+	{
+		auto meshIterator = graphicPipelineIterator->second.begin();
+
+		while (meshIterator != graphicPipelineIterator->second.end())
+		{
+			auto modelIterator = meshIterator->second.begin();
+
+			while (modelIterator != meshIterator->second.end())
+			{
+				ubo.model = glm::translate(glm::mat4(1.0), modelIterator->get()->position);
+				ubo.model = glm::rotate(ubo.model, time * glm::radians(30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+				modelIterator->get()->UpdateUniformBuffer(currentImage, &ubo);
+
+				modelIterator++;
+			}
+
+			meshIterator++;
+		}
+
+		graphicPipelineIterator++;
+	}
 }

@@ -5,6 +5,9 @@
 #include <vector>
 #include <stdexcept>
 #include <memory>
+#include <map>
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
 
 #include "VulkanInstance.h"
 #include "VulkanPhysicalDevice.h"
@@ -17,11 +20,14 @@
 #include "Mesh.h"
 #include "VulkanDescriptor.h"
 #include "GlfwManager.h"
+#include "Model.h"
 
 class VulkanManager
 {
 public:
 	static const int MAX_FRAMES_IN_FLIGHT = 2;
+	bool isDrawing = false;
+	glm::vec3 clearColor = glm::vec3(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f);
 
 private:
 	GLFWwindow* window;
@@ -36,15 +42,17 @@ private:
 	//TODO: Change this so we can have multiple and take ref in mesh
 	std::unique_ptr<VulkanShader> vertexShader;
 	std::unique_ptr<VulkanShader> fragShader;
-	std::unique_ptr <VulkanGraphicPipeline> graphicPipeline;
+	std::unique_ptr <VulkanGraphicPipeline> basicGraphicPipeline;
 
 	//TODO: Move this
 	VkCommandPool commandPool;
 
-	std::unique_ptr<Texture> chaletTexture;
-	std::unique_ptr<Mesh> chaletMesh;
+	std::map<VulkanGraphicPipeline*, std::map<Mesh*, std::vector<std::unique_ptr<Model>>>> modelList;
 
-	std::unique_ptr<VulkanDescriptor> descriptor;
+	std::unique_ptr<Texture> checkerTexture;
+	std::unique_ptr<Texture> debugTexture;
+	std::unique_ptr<Mesh> textMesh;
+	std::unique_ptr<Mesh> cubeMesh;
 
 	std::vector<VkCommandBuffer> commandBuffers;
 
@@ -60,6 +68,9 @@ public:
 	void RecreateSwapChain();
 
 	void Draw(GlfwManager* window);
+
+	void AddModelToList(Model* model);
+	void RemoveModelFromList(Model* model);
 
 	VulkanInstance* GetVulkanInstance();
 	VkSurfaceKHR GetVkSurfaceKHR();

@@ -21,9 +21,6 @@ private:
 	VkDeviceMemory depthImageMemory = nullptr;
 	VkImageView depthImageView = nullptr;
 
-	std::vector<VkBuffer> uniformBuffers;
-	std::vector<VkDeviceMemory> uniformBuffersMemory;
-
 	VkDevice device = nullptr;
 
 public:
@@ -32,10 +29,8 @@ public:
 
 	VkSwapchainKHR GetVkSwapchainKHR() const;
 	std::vector<VkImage> GetVkImages() const;
-	std::vector<VkBuffer> GetUniformBuffers() const;
 	std::vector<VkImageView> GetVkImageViews() const;
 	std::vector<VkFramebuffer> GetSwapChainFramebuffers() const;
-	std::vector<VkDeviceMemory> GetUniformBuffersMemory() const;
 	VkFormat GetSwapChainImageFormat() const;
 	VkExtent2D GetVkExtent2D() const;
 private:

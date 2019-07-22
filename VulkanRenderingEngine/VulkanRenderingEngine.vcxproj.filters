@@ -63,6 +63,9 @@
     <ClInclude Include="src\VulkanDescriptor.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Timer.cpp">
@@ -111,6 +114,9 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="src\VulkanDescriptor.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
