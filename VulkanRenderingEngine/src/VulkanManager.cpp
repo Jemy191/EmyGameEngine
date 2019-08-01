@@ -376,6 +376,7 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 	VulkanHelper::UniformBufferObject ubo = {};
 	ubo.view = glm::lookAt(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.0001f, 100000.0f);
+	ubo.viewPos = glm::vec3(0.0f, 5.0f, 5.0f);
 	ubo.proj[1][1] *= -1;
 
 	//TODO: make a function for that
