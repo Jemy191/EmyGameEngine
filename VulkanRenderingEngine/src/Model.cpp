@@ -1,8 +1,8 @@
 #include "Model.h"
 #include <iostream>
 
-Model::Model(VkDevice device, VkPhysicalDevice physicalDevice, size_t swapchainImagesSize, Mesh* mesh, Texture* texture, VulkanGraphicPipeline* graphicPipeline)
-	: device(device), physicalDevice(physicalDevice), mesh(mesh), texture(texture), graphicPipeline(graphicPipeline)
+Model::Model(VkDevice device, VkPhysicalDevice physicalDevice, size_t swapchainImagesSize, Mesh* mesh, Texture* texture, Texture* normalTexture, VulkanGraphicPipeline* graphicPipeline)
+	: device(device), physicalDevice(physicalDevice), mesh(mesh), texture(texture), normalTexture(normalTexture), graphicPipeline(graphicPipeline)
 {
 	Create(swapchainImagesSize);
 }
@@ -47,7 +47,7 @@ void Model::Create(size_t swapchainImagesSize)
 	}
 
 
-	descriptor = std::unique_ptr<VulkanDescriptor>(new VulkanDescriptor(device, swapchainImagesSize, uniformBuffers, graphicPipeline->layoutBinding.GetVkDescriptorSetLayout(), texture));
+	descriptor = std::unique_ptr<VulkanDescriptor>(new VulkanDescriptor(device, swapchainImagesSize, uniformBuffers, graphicPipeline->layoutBinding.GetVkDescriptorSetLayout(), texture, normalTexture));
 }
 
 void Model::Cleanup()

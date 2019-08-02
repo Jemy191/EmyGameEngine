@@ -19,10 +19,36 @@ int WinMain()
 		float timeToUpdateFPS = 0.25f;
 		float fpsUpdateTimer = timeToUpdateFPS;
 
+		float camSpeed = 5;
+
 		while (!glfwWindowShouldClose(glfwManager.GetWindow()))
 		{
 			glfwPollEvents();
 			FPSCounter::StartCounting();
+
+			glm::vec3 dir = glm::vec3(0);
+
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
+				dir.y = -1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
+				dir.x = 1;
+
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
+				dir.y = 1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
+				dir.x = -1;
+
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_Q))
+				dir.z = 1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
+				dir.z = -1;
+
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_UP))
+				camSpeed += 10 * FPSCounter::GetDeltaTime();
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
+				camSpeed += -10 * FPSCounter::GetDeltaTime();
+
+			vulkanManager.camPos += /*glm::normalize(*/dir * glm::floor(camSpeed) *FPSCounter::GetDeltaTime();
 
 			vulkanManager.Draw(&glfwManager);
 
@@ -33,7 +59,7 @@ int WinMain()
 			{
 				fpsUpdateTimer = 0;
 				std::stringstream ss;
-				ss << "Average FPS: " << FPSCounter::GetAverageFPS() << "FPS: " << FPSCounter::GetRawFPS() << "DeltaTime: " << (int)FPSCounter::GetDeltaTime();
+				ss << "Average FPS: " << FPSCounter::GetAverageFPS() << "FPS: " << FPSCounter::GetRawFPS() << "DeltaTime: " << (int)FPSCounter::GetDeltaTime() << "CamSpeed: " << glm::floor(camSpeed);
 				glfwManager.SetWindowTitle(ss.str());
 			}
 		}

@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <iostream>
+#include <array>
 
 const std::string Mesh::PATH = "Assets/Meshs/";
 
@@ -138,6 +139,8 @@ void Mesh::ObjLoader(std::string& meshPath)
 			// No vertex color
 			vertex.color = {1.0f, 1.0f, 1.0f};
 
+			vertex.tangent = glm::vec3(0);
+			vertex.biTangent = glm::vec3(0);
 
 			if (uniqueVertices.count(vertex) == 0)
 			{
@@ -147,6 +150,52 @@ void Mesh::ObjLoader(std::string& meshPath)
 
 			indices.push_back(uniqueVertices[vertex]);
 		}
+	}
+
+	std::vector<std::vector<glm::vec3>> tangents = std::vector<std::vector<glm::vec3>>(vertices.size(), std::vector<glm::vec3>());
+	std::vector<std::vector<glm::vec3>> biTangents = std::vector<std::vector<glm::vec3>>(vertices.size(), std::vector<glm::vec3>());
+
+	for (size_t i = 0; i < indices.size(); i += 3)
+	{
+		VulkanHelper::Vertex& vertex0 = vertices[indices[i + 0]];
+		VulkanHelper::Vertex& vertex1 = vertices[indices[i + 1]];
+		VulkanHelper::Vertex& vertex2 = vertices[indices[i + 2]];
+
+		// Edges of the triangle : position delta
+		glm::vec3 deltaPos1 = vertex1.pos - vertex0.pos;
+		glm::vec3 deltaPos2 = vertex2.pos - vertex0.pos;
+
+		// UV delta
+		glm::vec2 deltaUV1 = vertex1.texCoord - vertex0.texCoord;
+		glm::vec2 deltaUV2 = vertex2.texCoord - vertex0.texCoord;
+
+		float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+		glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+		glm::vec3 biTangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
+
+		tangents[indices[i + 0]].push_back(tangent);
+		tangents[indices[i + 1]].push_back(tangent);
+		tangents[indices[i + 2]].push_back(tangent);
+		biTangents[indices[i + 0]].push_back(biTangent);
+		biTangents[indices[i + 1]].push_back(biTangent);
+		biTangents[indices[i + 2]].push_back(biTangent);
+	}
+
+	for (size_t i = 0; i < tangents.size(); i++)
+	{
+		glm::vec3 average = glm::vec3(0);
+		for (size_t y = 0; y < tangents[i].size(); y++)
+		{
+			average += tangents[i][y];
+		}
+		vertices[i].tangent = average / (float)tangents[i].size();
+
+		average = glm::vec3(0);
+		for (size_t y = 0; y < biTangents[i].size(); y++)
+		{
+			average += biTangents[i][y];
+		}
+		vertices[i].biTangent = average / (float)biTangents[i].size();
 	}
 }
 

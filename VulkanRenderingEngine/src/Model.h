@@ -15,6 +15,7 @@ class Model
 public:
 	Mesh* mesh = nullptr;
 	Texture* texture = nullptr;
+	Texture* normalTexture = nullptr;
 	VulkanGraphicPipeline* graphicPipeline = nullptr;
 	glm::vec3 position; // Move this in a transform class?
 
@@ -27,7 +28,7 @@ private:
 	std::unique_ptr <VulkanDescriptor> descriptor;
 
 public:
-	Model(VkDevice device, VkPhysicalDevice physicalDevice, size_t swapchainImagesSize, Mesh* mesh, Texture* texture, VulkanGraphicPipeline* graphicPipeline);
+	Model(VkDevice device, VkPhysicalDevice physicalDevice, size_t swapchainImagesSize, Mesh* mesh, Texture* texture, Texture* normalTexture, VulkanGraphicPipeline* graphicPipeline);
 	~Model();
 
 	void Draw(VkCommandBuffer commandBuffer, int i);

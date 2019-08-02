@@ -10,6 +10,7 @@ void VulkanGraphicPipeline::Create(VkDevice device, VkExtent2D swapChainExtent, 
 
 	layoutBinding.AddLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);// Uniform binding for matrix
 	layoutBinding.AddLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);// Sampler for texture
+	layoutBinding.AddLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);// Sampler for texture
 
 	layoutBinding.Create(device);
 

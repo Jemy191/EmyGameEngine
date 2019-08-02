@@ -15,7 +15,7 @@ private:
 	std::vector<VkDescriptorSet> descriptorSets;
 
 public:
-	VulkanDescriptor(VkDevice device, size_t swapchainImageCount, std::vector<VkBuffer> uniformBuffers, VkDescriptorSetLayout descriptorSetLayout, Texture* texture);
+	VulkanDescriptor(VkDevice device, size_t swapchainImageCount, std::vector<VkBuffer> uniformBuffers, VkDescriptorSetLayout descriptorSetLayout, Texture* texture, Texture* normalTexture);
 	~VulkanDescriptor();
 
 	void CmdBind(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, int i);

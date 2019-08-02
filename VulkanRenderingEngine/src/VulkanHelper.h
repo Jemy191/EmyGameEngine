@@ -84,11 +84,13 @@ namespace VulkanHelper
 		glm::vec3 normal;
 		glm::vec3 color;
 		glm::vec2 texCoord;
+		glm::vec3 tangent;
+		glm::vec3 biTangent;
 
 		bool operator==(const Vertex& other) const;
 
 		static VkVertexInputBindingDescription GetBindingDescription();
-		static std::array<VkVertexInputAttributeDescription, 4> GetAttributeDescriptions();
+		static std::array<VkVertexInputAttributeDescription, 6> GetAttributeDescriptions();
 	};
 
 	struct UniformBufferObject

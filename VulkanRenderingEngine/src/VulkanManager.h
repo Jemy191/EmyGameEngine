@@ -7,6 +7,7 @@
 #include <memory>
 #include <map>
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 
 #include "VulkanInstance.h"
@@ -28,6 +29,9 @@ public:
 	static const int MAX_FRAMES_IN_FLIGHT = 2;
 	bool isDrawing = false;
 	glm::vec3 clearColor = glm::vec3(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f);
+
+	glm::vec3 camPos = glm::vec3(glm::vec3(0, 5.0f, 5.0f));
+	glm::vec3 camDir = glm::vec3(glm::vec3(0));
 
 private:
 	GLFWwindow* window;
@@ -51,6 +55,8 @@ private:
 
 	std::unique_ptr<Texture> checkerTexture;
 	std::unique_ptr<Texture> debugTexture;
+	std::unique_ptr<Texture> debugNormalTexture;
+	std::unique_ptr<Texture> testNormalTexture;
 	std::unique_ptr<Mesh> textMesh;
 	std::unique_ptr<Mesh> cubeMesh;
 

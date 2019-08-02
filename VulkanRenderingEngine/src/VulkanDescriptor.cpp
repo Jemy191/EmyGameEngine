@@ -4,16 +4,18 @@
 #include <iostream>
 #include "VulkanHelper.h"
 
-VulkanDescriptor::VulkanDescriptor(VkDevice device, size_t swapchainImageCount, std::vector<VkBuffer> uniformBuffers, VkDescriptorSetLayout descriptorSetLayout, Texture* texture)
+VulkanDescriptor::VulkanDescriptor(VkDevice device, size_t swapchainImageCount, std::vector<VkBuffer> uniformBuffers, VkDescriptorSetLayout descriptorSetLayout, Texture* texture, Texture* normalTexture)
 {
 	this->device = device;
 
 	//TODO: Unhardcode that couple that with shader. Maybe a shader type
-	std::array<VkDescriptorPoolSize, 2> poolSizes = {};
+	std::array<VkDescriptorPoolSize, 3> poolSizes = {};
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	poolSizes[0].descriptorCount = static_cast<uint32_t>(swapchainImageCount);
 	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	poolSizes[1].descriptorCount = static_cast<uint32_t>(swapchainImageCount);
+	poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[2].descriptorCount = static_cast<uint32_t>(swapchainImageCount);
 
 	VkDescriptorPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -46,12 +48,17 @@ VulkanDescriptor::VulkanDescriptor(VkDevice device, size_t swapchainImageCount, 
 		bufferInfo.offset = 0;
 		bufferInfo.range = sizeof(VulkanHelper::UniformBufferObject);
 
-		VkDescriptorImageInfo imageInfo = {};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = texture->GetTextureImageView();
-		imageInfo.sampler = texture->GetTextureSampler();
+		VkDescriptorImageInfo textureImageInfo = {};
+		textureImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		textureImageInfo.imageView = texture->GetTextureImageView();
+		textureImageInfo.sampler = texture->GetTextureSampler();
 
-		std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
+		VkDescriptorImageInfo normalTextureImageInfo = {};
+		normalTextureImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		normalTextureImageInfo.imageView = normalTexture->GetTextureImageView();
+		normalTextureImageInfo.sampler = normalTexture->GetTextureSampler();
+
+		std::array<VkWriteDescriptorSet, 3> descriptorWrites = {};
 
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[0].dstSet = descriptorSets[i];
@@ -67,7 +74,15 @@ VulkanDescriptor::VulkanDescriptor(VkDevice device, size_t swapchainImageCount, 
 		descriptorWrites[1].dstArrayElement = 0;
 		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorWrites[1].descriptorCount = 1;
-		descriptorWrites[1].pImageInfo = &imageInfo;
+		descriptorWrites[1].pImageInfo = &textureImageInfo;
+
+		descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[2].dstSet = descriptorSets[i];
+		descriptorWrites[2].dstBinding = 2;
+		descriptorWrites[2].dstArrayElement = 0;
+		descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[2].descriptorCount = 1;
+		descriptorWrites[2].pImageInfo = &normalTextureImageInfo;
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}

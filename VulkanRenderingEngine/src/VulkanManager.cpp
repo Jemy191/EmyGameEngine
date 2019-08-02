@@ -49,15 +49,18 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	checkerTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Checker.jpg"));
 	debugTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Debug.jpg"));
 
-	textMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "CubeSuzaneConeSphere.obj", Mesh::MeshFormat::OBJ));
+	debugNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "DebugNormalMap.jpg"));
+	//testNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "TestNormalMap.png"));
+
+	//textMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "CubeSuzaneConeSphere.obj", Mesh::MeshFormat::OBJ));
 	cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Cube.obj", Mesh::MeshFormat::OBJ));
 
-	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), checkerTexture.get(), basicGraphicPipeline.get());
-	testModel->position = glm::vec3(0.0);
-	AddModelToList(testModel);
+	//Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), checkerTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
+	//testModel->position = glm::vec3(0.0);
+	//AddModelToList(testModel);
 
-	Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), basicGraphicPipeline.get());
-	cubeModel->position = glm::vec3(3, 0, 0);
+	Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
+	cubeModel->position = glm::vec3(0, 0, 0);
 	AddModelToList(cubeModel);
 
 	CreateCommandBuffer();
@@ -374,9 +377,9 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 	VulkanHelper::UniformBufferObject ubo = {};
-	ubo.view = glm::lookAt(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.viewPos = camPos;
+	ubo.view = glm::lookAt(camPos, glm::vec3(0)/*camPos + glm::normalize(camDir)*/, glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.0001f, 100000.0f);
-	ubo.viewPos = glm::vec3(0.0f, 5.0f, 5.0f);
 	ubo.proj[1][1] *= -1;
 
 	//TODO: make a function for that
@@ -394,7 +397,7 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 			while (modelIterator != meshIterator->second.end())
 			{
 				ubo.model = glm::translate(glm::mat4(1.0), modelIterator->get()->position);
-				ubo.model = glm::rotate(ubo.model, time * glm::radians(30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+				//ubo.model = glm::rotate(ubo.model, time * glm::radians(30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 				modelIterator->get()->UpdateUniformBuffer(currentImage, &ubo);
 
