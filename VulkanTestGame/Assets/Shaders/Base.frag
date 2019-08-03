@@ -55,7 +55,7 @@ void main()
 	textureNormal = normalize(textureNormal * 2.0 - 1.0);
 	textureNormal = normalize(TBN * textureNormal);
 
-	vec4 textureColor = texture(texSampler, fragTexCoord);
+	vec4 textureColor = texture(texSampler, fragTexCoord * 2.0);
 
 	//outColor = vec4(textureNormal, 0.0);
 	outColor = vec4(directional_light(textureNormal, TBN, lightColor, textureColor.rgb, lightDir, modelMatrix, viewMatrix, viewPosition, shininess, specularity), 1.0);

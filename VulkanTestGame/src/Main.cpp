@@ -4,6 +4,7 @@
 #include <GlfwManager.h>
 #include <VulkanManager.h>
 #include <FPSCounter.h>
+#include <glm/gtx/rotate_vector.hpp>
 
 #if DEBUG
 int main()
@@ -19,7 +20,12 @@ int WinMain()
 		float timeToUpdateFPS = 0.25f;
 		float fpsUpdateTimer = timeToUpdateFPS;
 
-		float camSpeed = 5;
+		float camSpeed = 20;
+		float lookSpeed = 0.5f;
+
+		double mousePosX, mousePosY;
+		glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
+		glm::vec2 lastMousePos = glm::vec2(mousePosX, mousePosY);
 
 		while (!glfwWindowShouldClose(glfwManager.GetWindow()))
 		{
@@ -28,27 +34,46 @@ int WinMain()
 
 			glm::vec3 dir = glm::vec3(0);
 
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
-				dir.y = -1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
-				dir.x = 1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_ESCAPE))
+				break;
 
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
 				dir.y = 1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
 				dir.x = -1;
 
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
+				dir.y = -1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
+				dir.x = 1;
+
 			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_Q))
-				dir.z = 1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
 				dir.z = -1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
+				dir.z = 1;
 
 			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_UP))
 				camSpeed += 10 * FPSCounter::GetDeltaTime();
 			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
 				camSpeed += -10 * FPSCounter::GetDeltaTime();
+			
+			vulkanManager.camPos += dir.y * vulkanManager.camDir * glm::floor(camSpeed) * FPSCounter::GetDeltaTime();
+			vulkanManager.camPos += dir.x * glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)) * glm::floor(camSpeed) * FPSCounter::GetDeltaTime();
+			vulkanManager.camPos.z += dir.z * glm::floor(camSpeed) * FPSCounter::GetDeltaTime();
 
-			vulkanManager.camPos += /*glm::normalize(*/dir * glm::floor(camSpeed) *FPSCounter::GetDeltaTime();
+			double mousePosX, mousePosY;
+			glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
+			glm::vec2 mousePos = glm::vec2(mousePosX, mousePosY);
+
+			glm::vec2 mouseDelta = lastMousePos - mousePos;
+
+			if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_LEFT))
+			{
+				vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.x * lookSpeed * FPSCounter::GetDeltaTime(), glm::vec3(0, 0, 1));
+				vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.y * lookSpeed * FPSCounter::GetDeltaTime(), glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)));
+			}
+
+			lastMousePos = mousePos;
 
 			vulkanManager.Draw(&glfwManager);
 

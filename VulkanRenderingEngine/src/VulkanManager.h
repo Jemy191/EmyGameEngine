@@ -30,8 +30,8 @@ public:
 	bool isDrawing = false;
 	glm::vec3 clearColor = glm::vec3(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f);
 
-	glm::vec3 camPos = glm::vec3(glm::vec3(0, 5.0f, 5.0f));
-	glm::vec3 camDir = glm::vec3(glm::vec3(0));
+	glm::vec3 camPos = glm::vec3(glm::vec3(0, 5.0f, 0.0f));
+	glm::vec3 camDir = glm::vec3(glm::vec3(0, -1, 0));
 
 private:
 	GLFWwindow* window;
@@ -44,9 +44,11 @@ private:
 	std::unique_ptr<VulkanRenderPass> renderPass;
 
 	//TODO: Change this so we can have multiple and take ref in mesh
-	std::unique_ptr<VulkanShader> vertexShader;
-	std::unique_ptr<VulkanShader> fragShader;
+	std::unique_ptr<VulkanShader> baseVertexShader;
+	std::unique_ptr<VulkanShader> baseFragShader;
+	std::unique_ptr<VulkanShader> textureColorFragShader;
 	std::unique_ptr <VulkanGraphicPipeline> basicGraphicPipeline;
+	std::unique_ptr <VulkanGraphicPipeline> textureColorGraphicPipeline;
 
 	//TODO: Move this
 	VkCommandPool commandPool;

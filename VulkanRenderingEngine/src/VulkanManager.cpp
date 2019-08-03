@@ -36,15 +36,22 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	swapChain = std::unique_ptr<VulkanSwapChain>(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), commandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
 
 	// TestMesh and shader
-	vertexShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT));
-	fragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
+	baseVertexShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "BaseVert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT));
+	baseFragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "BaseFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
+	textureColorFragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "TextureColorFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
 
 	basicGraphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
+	textureColorGraphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
 
-	basicGraphicPipeline->AddShader(vertexShader.get());
-	basicGraphicPipeline->AddShader(fragShader.get());
+	basicGraphicPipeline->AddShader(baseVertexShader.get());
+	basicGraphicPipeline->AddShader(baseFragShader.get());
+
+
+	textureColorGraphicPipeline->AddShader(baseVertexShader.get());
+	textureColorGraphicPipeline->AddShader(textureColorFragShader.get());
 
 	basicGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+	textureColorGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 
 	checkerTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Checker.jpg"));
 	debugTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Debug.jpg"));
@@ -52,15 +59,15 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	debugNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "DebugNormalMap.jpg"));
 	//testNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "TestNormalMap.png"));
 
-	//textMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "CubeSuzaneConeSphere.obj", Mesh::MeshFormat::OBJ));
-	cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Cube.obj", Mesh::MeshFormat::OBJ));
+	textMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
+	cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Sphere.obj", Mesh::MeshFormat::OBJ));
 
-	//Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), checkerTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
-	//testModel->position = glm::vec3(0.0);
-	//AddModelToList(testModel);
+	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), debugTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
+	testModel->position = glm::vec3(0.0);
+	AddModelToList(testModel);
 
 	Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
-	cubeModel->position = glm::vec3(0, 0, 0);
+	cubeModel->position = glm::vec3(0);
 	AddModelToList(cubeModel);
 
 	CreateCommandBuffer();
@@ -76,8 +83,8 @@ VulkanManager::~VulkanManager()
 	swapChain.reset();
 	modelList.clear();
 	vkDestroySurfaceKHR(vulkanInstance->GetInstance(), surface, nullptr);
-	vertexShader.reset();
-	fragShader.reset();
+	baseVertexShader.reset();
+	baseFragShader.reset();
 
 	vkFreeCommandBuffers(logicalDevice->GetVKDevice(), commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
@@ -109,8 +116,8 @@ void VulkanManager::RecreateSwapChain()
 
 	basicGraphicPipeline.reset(new VulkanGraphicPipeline());
 
-	basicGraphicPipeline->AddShader(vertexShader.get());
-	basicGraphicPipeline->AddShader(fragShader.get());
+	basicGraphicPipeline->AddShader(baseVertexShader.get());
+	basicGraphicPipeline->AddShader(baseFragShader.get());
 
 	basicGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 
@@ -378,8 +385,8 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 
 	VulkanHelper::UniformBufferObject ubo = {};
 	ubo.viewPos = camPos;
-	ubo.view = glm::lookAt(camPos, glm::vec3(0)/*camPos + glm::normalize(camDir)*/, glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.0001f, 100000.0f);
+	ubo.view = glm::lookAt(camPos, camPos + glm::normalize(camDir), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj[1][1] *= -1;
 
 	//TODO: make a function for that
