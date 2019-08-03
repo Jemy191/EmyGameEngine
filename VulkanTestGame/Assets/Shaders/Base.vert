@@ -6,6 +6,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 view;
     mat4 proj;
 	vec3 viewPos;
+	vec3 lightPos;
 } ubo;
 
 // In
@@ -25,16 +26,23 @@ layout(location = 3) out mat4 modelMatrix;
 layout(location = 7) out mat4 viewMatrix;
 layout(location = 11) out vec3 viewPosition;
 layout(location = 12) out mat3 TBN; // tangent bi normal
+layout(location = 15) out vec3 lightPos;
+layout(location = 16) out vec3 fragPos;
 
 
-void main() {
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+void main()
+{
+	vec4 vertexPosition = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+    gl_Position = vertexPosition;
+	fragPos =  (ubo.model * vec4(inPosition, 1.0)).xyz;
+
     fragVertexColor = inColor;
 	fragTexCoord = inTexCoord;
 	fragNormal = inNormal;
 	modelMatrix = ubo.model;
 	viewMatrix = ubo.view;
 	viewPosition = ubo.viewPos;
+	lightPos = ubo.lightPos;
 
 	vec3 T = normalize(vec3(ubo.model * vec4(inTangent,   0.0)));
     vec3 B = normalize(vec3(ubo.model * vec4(inBiTangent, 0.0)));

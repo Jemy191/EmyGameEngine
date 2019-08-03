@@ -32,6 +32,7 @@ int WinMain()
 			glfwPollEvents();
 			FPSCounter::StartCounting();
 
+			//cam movement
 			glm::vec3 dir = glm::vec3(0);
 
 			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_ESCAPE))
@@ -57,23 +58,43 @@ int WinMain()
 			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
 				camSpeed += -10 * FPSCounter::GetDeltaTime();
 			
-			vulkanManager.camPos += dir.y * vulkanManager.camDir * glm::floor(camSpeed) * FPSCounter::GetDeltaTime();
-			vulkanManager.camPos += dir.x * glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)) * glm::floor(camSpeed) * FPSCounter::GetDeltaTime();
-			vulkanManager.camPos.z += dir.z * glm::floor(camSpeed) * FPSCounter::GetDeltaTime();
+			vulkanManager.camPos += dir.y * vulkanManager.camDir * camSpeed * FPSCounter::GetDeltaTime();
+			vulkanManager.camPos += dir.x * glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)) * camSpeed * FPSCounter::GetDeltaTime();
+			vulkanManager.camPos.z += dir.z * camSpeed * FPSCounter::GetDeltaTime();
 
+			// cam rotation
 			double mousePosX, mousePosY;
 			glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
 			glm::vec2 mousePos = glm::vec2(mousePosX, mousePosY);
 
 			glm::vec2 mouseDelta = lastMousePos - mousePos;
 
-			if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_LEFT))
+			if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
 			{
 				vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.x * lookSpeed * FPSCounter::GetDeltaTime(), glm::vec3(0, 0, 1));
 				vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.y * lookSpeed * FPSCounter::GetDeltaTime(), glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)));
 			}
 
 			lastMousePos = mousePos;
+
+			// light movement
+			dir = glm::vec3(0);
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_I))
+				dir.y = 1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_J))
+				dir.x = -1;
+
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_K))
+				dir.y = -1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_L))
+				dir.x = 1;
+
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_U))
+				dir.z = -1;
+			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_O))
+				dir.z = 1;
+
+			vulkanManager.lightPos += dir * camSpeed * FPSCounter::GetDeltaTime();
 
 			vulkanManager.Draw(&glfwManager);
 
@@ -84,7 +105,11 @@ int WinMain()
 			{
 				fpsUpdateTimer = 0;
 				std::stringstream ss;
-				ss << "Average FPS: " << FPSCounter::GetAverageFPS() << "FPS: " << FPSCounter::GetRawFPS() << "DeltaTime: " << (int)FPSCounter::GetDeltaTime() << "CamSpeed: " << glm::floor(camSpeed);
+				ss  << "Average FPS: " << FPSCounter::GetAverageFPS()
+					<< " FPS: " << FPSCounter::GetRawFPS()
+					<< " DeltaTime: " << (int)FPSCounter::GetDeltaTime()
+					<< " CamSpeed: " << camSpeed
+					<< " Light dir: " << dir.x << " " << dir.y << " " << dir.z;
 				glfwManager.SetWindowTitle(ss.str());
 			}
 		}

@@ -30,8 +30,9 @@ public:
 	bool isDrawing = false;
 	glm::vec3 clearColor = glm::vec3(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f);
 
-	glm::vec3 camPos = glm::vec3(glm::vec3(0, 5.0f, 0.0f));
-	glm::vec3 camDir = glm::vec3(glm::vec3(0, -1, 0));
+	glm::vec3 camPos = glm::vec3(0, 5.0f, 0.0f);
+	glm::vec3 camDir = glm::vec3(0, -1, 0);
+	glm::vec3 lightPos = glm::vec3(0);
 
 private:
 	GLFWwindow* window;
@@ -61,6 +62,7 @@ private:
 	std::unique_ptr<Texture> testNormalTexture;
 	std::unique_ptr<Mesh> textMesh;
 	std::unique_ptr<Mesh> cubeMesh;
+	std::unique_ptr<Mesh> planeMesh;
 
 	std::vector<VkCommandBuffer> commandBuffers;
 

@@ -12,10 +12,12 @@ layout(location = 3) in mat4 modelMatrix;
 layout(location = 7) in mat4 viewMatrix;
 layout(location = 11) in vec3 viewPosition;
 layout(location = 12) in mat3 TBN; // tangent bi normal
+layout(location = 15) in vec3 lightPos;
+layout(location = 16) in vec3 fragPos;
 
 layout(location = 0) out vec4 outColor;
 
-const vec3 lightDir = vec3(1.0, 0.0, 1.0);
+//const vec3 lightDir = vec3(1.0, 0.0, 1.0);
 
 const float shininess = 5; // Set to lower values for matte, higher for gloss.
 const float specularity = 1; //  The amount by which to scale the specular light cast on the object.
@@ -57,6 +59,11 @@ void main()
 
 	vec4 textureColor = texture(texSampler, fragTexCoord * 2.0);
 
-	//outColor = vec4(textureNormal, 0.0);
-	outColor = vec4(directional_light(textureNormal, TBN, lightColor, textureColor.rgb, lightDir, modelMatrix, viewMatrix, viewPosition, shininess, specularity), 1.0);
+	vec3 lightDir = lightPos - fragPos;
+
+	float lightDistance = length(lightDir);
+	vec3 k = vec3(1.0, 0.05, 0.3) / 10.0;
+
+	float attenuation = 1.0 / (k.x+(k.y*lightDistance)+(k.z*lightDistance*lightDistance));
+	outColor = attenuation * vec4(directional_light(textureNormal, TBN, lightColor, textureColor.rgb, lightDir, modelMatrix, viewMatrix, viewPosition, shininess, specularity), 1.0);
 }

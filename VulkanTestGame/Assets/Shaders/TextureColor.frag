@@ -12,6 +12,8 @@ layout(location = 3) in mat4 modelMatrix;
 layout(location = 7) in mat4 viewMatrix;
 layout(location = 11) in vec3 viewPosition;
 layout(location = 12) in mat3 TBN; // tangent bi normal
+layout(location = 15) in vec3 lightPos;
+layout(location = 16) in vec3 fragPos;
 
 layout(location = 0) out vec4 outColor;
 

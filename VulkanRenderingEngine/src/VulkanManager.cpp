@@ -60,15 +60,20 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	//testNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "TestNormalMap.png"));
 
 	textMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
-	cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Sphere.obj", Mesh::MeshFormat::OBJ));
+	cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "MultiCube.obj", Mesh::MeshFormat::OBJ));
+	planeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Plane.obj", Mesh::MeshFormat::OBJ));
 
 	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), debugTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
-	testModel->position = glm::vec3(0.0);
+	testModel->position = glm::vec3(0);
 	AddModelToList(testModel);
 
 	Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
 	cubeModel->position = glm::vec3(0);
 	AddModelToList(cubeModel);
+
+	Model* planeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), planeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
+	planeModel->position = glm::vec3(0, 0, -3);
+	AddModelToList(planeModel);
 
 	CreateCommandBuffer();
 
@@ -385,6 +390,7 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 
 	VulkanHelper::UniformBufferObject ubo = {};
 	ubo.viewPos = camPos;
+	ubo.lightPos = lightPos;
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.0001f, 100000.0f);
 	ubo.view = glm::lookAt(camPos, camPos + glm::normalize(camDir), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj[1][1] *= -1;
