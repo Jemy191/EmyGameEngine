@@ -67,6 +67,7 @@ private:
 	std::unique_ptr<Mesh> planeMesh;
 
 	std::vector<Mesh*> meshList = std::vector<Mesh*>();
+	std::vector<Texture*> textureList = std::vector<Texture*>();
 
 	//TODO: Move this
 	std::vector <VkCommandPool> drawCommandPool;
@@ -87,7 +88,7 @@ public:
 
 	void Present(GlfwManager* window);
 
-	void BasicLoadModel(std::string meshName);
+	void BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
 
 	void AddModelToList(Model* model);
 	void RemoveModelFromList(Model* model);

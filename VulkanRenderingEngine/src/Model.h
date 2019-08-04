@@ -17,7 +17,11 @@ public:
 	Texture* texture = nullptr;
 	Texture* normalTexture = nullptr;
 	VulkanGraphicPipeline* graphicPipeline = nullptr;
-	glm::vec3 position; // Move this in a transform class?
+	glm::vec3 position = glm::vec3(0); // Move this in a transform class?
+	glm::vec3 rotation = glm::vec3(0);
+	glm::vec3 scale = glm::vec3(1);
+	std::string meshName = "Cube";
+	std::string textureName = "Debug.jpg";
 
 private:
 	VkDevice device;

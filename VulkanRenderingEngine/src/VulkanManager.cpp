@@ -3,6 +3,8 @@
 
 #include "VulkanHelper.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #include <chrono>
 #include <algorithm>
@@ -71,22 +73,22 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	//testNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "TestNormalMap.png"));
 
 	textMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
-	cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "MultiCube.obj", Mesh::MeshFormat::OBJ));
-	planeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Plane.obj", Mesh::MeshFormat::OBJ));
-
+	//cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "MultiCube.obj", Mesh::MeshFormat::OBJ));
+	//planeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Plane.obj", Mesh::MeshFormat::OBJ));
+	//
 	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), debugTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
 	testModel->position = glm::vec3(0);
 	AddModelToList(testModel);
-	models.push_back(testModel);
 
-	Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
-	cubeModel->position = glm::vec3(0);
-	AddModelToList(cubeModel);
-	models.push_back(cubeModel);
-
-	Model* planeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), planeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
-	planeModel->position = glm::vec3(0, 0, -3);
-	AddModelToList(planeModel);
+	//
+	//Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
+	//cubeModel->position = glm::vec3(0);
+	//AddModelToList(cubeModel);
+	//models.push_back(cubeModel);
+	//
+	//Model* planeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), planeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
+	//planeModel->position = glm::vec3(0, 0, -3);
+	//AddModelToList(planeModel);
 
 	CreateCommandBuffer();
 
@@ -128,6 +130,11 @@ VulkanManager::~VulkanManager()
 		delete meshList[i];
 	}
 	meshList.clear();
+	for (size_t i = 0; i < textureList.size(); i++)
+	{
+		delete textureList[i];
+	}
+	textureList.clear();
 
 	std::cout << "Vulkan destroyed" << std::endl;
 }
@@ -329,13 +336,22 @@ void VulkanManager::Present(GlfwManager* window)
 	vkQueueWaitIdle(logicalDevice->GetPresentQueue());
 }
 
-void VulkanManager::BasicLoadModel(std::string meshName)
+void VulkanManager::BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
 	Mesh* newMesh = new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), meshName + ".obj", Mesh::MeshFormat::OBJ);
 	meshList.push_back(newMesh);
 
-	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), newMesh, debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
-	testModel->position = glm::vec3(0);
+	Texture* newTexture = new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), textureName);
+	textureList.push_back(newTexture);
+
+	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), newMesh, newTexture, debugNormalTexture.get(), basicGraphicPipeline.get());
+
+	testModel->position = position;
+	testModel->rotation = rotation;
+	testModel->scale = scale;
+	testModel->meshName = meshName;
+	testModel->textureName = textureName;
+
 	AddModelToList(testModel);
 	models.push_back(testModel);
 }
@@ -468,7 +484,9 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 			while (modelIterator != meshIterator->second.end())
 			{
 				ubo.model = glm::translate(glm::mat4(1.0), modelIterator->get()->position);
-				//ubo.model = glm::rotate(ubo.model, time * glm::radians(30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+				ubo.model *= glm::mat4_cast(glm::quat(glm::radians(modelIterator->get()->rotation)));
+				ubo.model = glm::scale(ubo.model, modelIterator->get()->scale);
+				
 
 				modelIterator->get()->UpdateUniformBuffer(currentImage, &ubo);
 

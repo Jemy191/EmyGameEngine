@@ -19,7 +19,7 @@ layout(location = 18) in vec3 lightColor;
 
 layout(location = 0) out vec4 outColor;
 
-vec3 directional_light(vec3 normal, mat3 tbn, vec3 lightColor, vec3 surface, vec3 lightDirection, mat4 modelMatrix, mat4 viewMatrix, vec3 viewPosition, float shininess, float specularity)
+vec3 directional_light(vec3 normal, vec3 lightColor, vec3 surface, vec3 lightDirection, mat4 modelMatrix, mat4 viewMatrix, vec3 viewPosition, float shininess, float specularity)
 {
   vec3 direction = normalize((vec4(lightDirection, 1.0)).xyz);
 
@@ -39,8 +39,7 @@ vec3 directional_light(vec3 normal, mat3 tbn, vec3 lightColor, vec3 surface, vec
 
 vec3 directional_light(vec3 normal, vec3 lightColor, vec3 surface, vec3 lightDirection, mat4 modelMatrix, mat4 viewMatrix, vec3 viewPosition)
 {
-  vec3 direction = normalize((modelMatrix * vec4(lightDirection, 1.0)).xyz);
-
+  vec3 direction = normalize((vec4(lightDirection, 1.0)).xyz);
   float diffuse = max(dot(normal, direction), 0.0);
 
   return max(lightColor * diffuse * surface, vec3(0.0));
@@ -64,5 +63,5 @@ void main()
 	float shininess = lightSetting.x; // Set to lower values for matte, higher for gloss.
 	float specularity = lightSetting.y; //  The amount by which to scale the specular light cast on the object.
 
-	outColor = vec4(directional_light(TBN[2], TBN, lightColor, textureColor.rgb, lightDir, modelMatrix, viewMatrix, viewPosition, shininess, specularity), 1.0);
+	outColor = vec4(directional_light(TBN[2], lightColor, textureColor.rgb, lightDir, modelMatrix, viewMatrix, viewPosition), 1.0);
 }
