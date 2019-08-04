@@ -22,12 +22,12 @@
 #include "VulkanDescriptor.h"
 #include "GlfwManager.h"
 #include "Model.h"
+#include "ImguiStuff.h"
 
 class VulkanManager
 {
 public:
 	static const int MAX_FRAMES_IN_FLIGHT = 2;
-	bool isDrawing = false;
 	glm::vec3 clearColor = glm::vec3(100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f);
 
 	glm::vec3 camPos = glm::vec3(0, 5.0f, 0.0f);
@@ -51,8 +51,7 @@ private:
 	std::unique_ptr <VulkanGraphicPipeline> basicGraphicPipeline;
 	std::unique_ptr <VulkanGraphicPipeline> textureColorGraphicPipeline;
 
-	//TODO: Move this
-	VkCommandPool commandPool;
+	std::unique_ptr<ImguiStuff> imguiStuff;
 
 	std::map<VulkanGraphicPipeline*, std::map<Mesh*, std::vector<std::unique_ptr<Model>>>> modelList;
 
@@ -64,7 +63,11 @@ private:
 	std::unique_ptr<Mesh> cubeMesh;
 	std::unique_ptr<Mesh> planeMesh;
 
+	//TODO: Move this
+	std::vector <VkCommandPool> drawCommandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
+
+	VkCommandPool commandPool;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -77,16 +80,19 @@ public:
 
 	void RecreateSwapChain();
 
-	void Draw(GlfwManager* window);
+	void Present(GlfwManager* window);
 
 	void AddModelToList(Model* model);
 	void RemoveModelFromList(Model* model);
 
-	VulkanInstance* GetVulkanInstance();
-	VkSurfaceKHR GetVkSurfaceKHR();
+	VulkanInstance* GetVulkanInstance() const;
+	VkSurfaceKHR GetVkSurfaceKHR() const;
+	ImguiStuff* GetImguiStuff() const;
 	void WaitForIdle();
 
 private:
+	void Draw();
+
 	void CreateCommandBuffer();// TODO: Not here?
 	void CreateSyncObject();// TODO: Not here?
 	void UpdateUniformBuffer(uint32_t currentImage);// TODO: Not here?

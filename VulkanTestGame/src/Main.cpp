@@ -6,6 +6,12 @@
 #include <FPSCounter.h>
 #include <glm/gtx/rotate_vector.hpp>
 
+bool demoWindowOpen = true;
+void GUI()
+{
+	ImGui::ShowDemoWindow(&demoWindowOpen);
+}
+
 #if DEBUG
 int main()
 #else
@@ -16,7 +22,7 @@ int WinMain()
 	try
 	{
 		GlfwManager glfwManager = GlfwManager(800, 600, "TestGame");
-		VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_64_BIT);
+		VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
 		float timeToUpdateFPS = 0.25f;
 		float fpsUpdateTimer = timeToUpdateFPS;
 
@@ -96,7 +102,13 @@ int WinMain()
 
 			vulkanManager.lightPos += dir * camSpeed * FPSCounter::GetDeltaTime();
 
-			vulkanManager.Draw(&glfwManager);
+			vulkanManager.GetImguiStuff()->StartFrame();
+
+			GUI();
+
+			vulkanManager.GetImguiStuff()->EndFrame();
+
+			vulkanManager.Present(&glfwManager);
 
 			FPSCounter::StopCounting();
 

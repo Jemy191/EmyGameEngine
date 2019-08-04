@@ -35,6 +35,18 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	renderPass = std::unique_ptr<VulkanRenderPass>(new VulkanRenderPass(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample()));
 	swapChain = std::unique_ptr<VulkanSwapChain>(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), commandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
 
+	drawCommandPool.resize(swapChain->GetSwapChainFramebuffers().size());
+	for (size_t i = 0; i < swapChain->GetSwapChainFramebuffers().size(); i++)
+	{
+		if (vkCreateCommandPool(logicalDevice->GetVKDevice(), &poolInfo, nullptr, &drawCommandPool[i]) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create graphics command pool!");
+		}
+	}
+
+	uint32_t minImageCount = VulkanHelper::QuerySwapChainSupport(physicalDevice->GetVKPhysicalDevice(), surface).capabilities.minImageCount + 1;
+	imguiStuff = std::unique_ptr<ImguiStuff>(new ImguiStuff(logicalDevice->GetVKDevice(), window, vulkanInstance->GetInstance(), physicalDevice->GetVKPhysicalDevice(), renderPass->GetVkRenderPass(), queueFamilyIndices.graphicsFamily.value(), logicalDevice->GetGraphicsQueue(), commandPool, (uint32_t)(swapChain->GetVkImages().size()), minImageCount));
+
 	// TestMesh and shader
 	baseVertexShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "BaseVert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT));
 	baseFragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "BaseFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
@@ -91,7 +103,10 @@ VulkanManager::~VulkanManager()
 	baseVertexShader.reset();
 	baseFragShader.reset();
 
-	vkFreeCommandBuffers(logicalDevice->GetVKDevice(), commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+	for (size_t i = 0; i < commandBuffers.size(); i++)
+	{
+		vkFreeCommandBuffers(logicalDevice->GetVKDevice(), drawCommandPool[i], 1 , &commandBuffers[i]);
+	}
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
@@ -101,6 +116,11 @@ VulkanManager::~VulkanManager()
 	}
 
 	vkDestroyCommandPool(logicalDevice->GetVKDevice(), commandPool, nullptr);
+
+	for (size_t i = 0; i < drawCommandPool.size(); i++)
+	{
+		vkDestroyCommandPool(logicalDevice->GetVKDevice(), drawCommandPool[i], nullptr);
+	}
 
 	std::cout << "Vulkan destroyed" << std::endl;
 }
@@ -151,14 +171,86 @@ void VulkanManager::RecreateSwapChain()
 		graphicPipelineIterator++;
 	}
 
-	vkFreeCommandBuffers(logicalDevice->GetVKDevice(), commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+	for (size_t i = 0; i < commandBuffers.size(); i++)
+	{
+		vkFreeCommandBuffers(logicalDevice->GetVKDevice(), drawCommandPool[i], 1, &commandBuffers[i]);
+	}
 	CreateCommandBuffer();
 }
 
-void VulkanManager::Draw(GlfwManager* window)
+void VulkanManager::Draw()
 {
-	isDrawing = true;
+	for (size_t i = 0; i < commandBuffers.size(); i++)
+	{
+		vkResetCommandPool(logicalDevice->GetVKDevice(), drawCommandPool[i], 0);
 
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to begin recording command buffer!");
+		}
+
+		VkRenderPassBeginInfo renderPassInfo = {};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = renderPass->GetVkRenderPass();
+		renderPassInfo.framebuffer = swapChain->GetSwapChainFramebuffers()[i];
+		renderPassInfo.renderArea.offset = {0, 0};
+		renderPassInfo.renderArea.extent = swapChain->GetVkExtent2D();
+
+		std::array<VkClearValue, 2> clearValues = {};
+		clearValues[0].color = {clearColor.r, clearColor.g, clearColor.b, 1.0f};
+		clearValues[1].depthStencil = {1.0f, 0};
+
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+
+		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		//TODO: make a function for that
+		// Draw model
+		auto graphicPipelineIterator = modelList.begin();
+
+		while (graphicPipelineIterator != modelList.end())
+		{
+			auto meshIterator = graphicPipelineIterator->second.begin();
+
+			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicPipelineIterator->first->GetVkPipeline());
+
+			while (meshIterator != graphicPipelineIterator->second.end())
+			{
+				auto modelIterator = meshIterator->second.begin();
+
+				meshIterator->first->CmdBind(commandBuffers[i]);
+
+				while (modelIterator != meshIterator->second.end())
+				{
+					modelIterator->get()->Draw(commandBuffers[i], i);
+
+					modelIterator++;
+				}
+
+				meshIterator++;
+			}
+
+			graphicPipelineIterator++;
+		}
+
+		imguiStuff->Draw(commandBuffers[i]);
+
+		vkCmdEndRenderPass(commandBuffers[i]);
+
+		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to record command buffer!");
+		}
+	}
+}
+
+void VulkanManager::Present(GlfwManager* window)
+{
 	vkWaitForFences(logicalDevice->GetVKDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 	uint32_t imageIndex;
@@ -193,7 +285,8 @@ void VulkanManager::Draw(GlfwManager* window)
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
 	vkResetFences(logicalDevice->GetVKDevice(), 1, &inFlightFences[currentFrame]);
-
+	
+	Draw();
 	if (vkQueueSubmit(logicalDevice->GetGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to submit draw command buffer!");
@@ -225,7 +318,8 @@ void VulkanManager::Draw(GlfwManager* window)
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
-	isDrawing = false;
+
+	vkQueueWaitIdle(logicalDevice->GetPresentQueue());
 }
 
 void VulkanManager::AddModelToList(Model* model)
@@ -237,7 +331,7 @@ void VulkanManager::AddModelToList(Model* model)
 			model->graphicPipeline, map<Mesh*, vector<unique_ptr<Model>>>()
 			));
 	}
-	
+
 	if (modelList[model->graphicPipeline].count(model->mesh) == 0)
 	{
 		modelList[model->graphicPipeline].insert(pair<Mesh*, vector<unique_ptr<Model>>>(
@@ -262,14 +356,19 @@ void VulkanManager::RemoveModelFromList(Model* model)
 		modelList.erase(model->graphicPipeline);
 }
 
-VulkanInstance* VulkanManager::GetVulkanInstance()
+VulkanInstance* VulkanManager::GetVulkanInstance() const
 {
 	return vulkanInstance.get();
 }
 
-VkSurfaceKHR VulkanManager::GetVkSurfaceKHR()
+VkSurfaceKHR VulkanManager::GetVkSurfaceKHR() const
 {
 	return surface;
+}
+
+ImguiStuff* VulkanManager::GetImguiStuff() const
+{
+	return imguiStuff.get();
 }
 
 void VulkanManager::WaitForIdle()
@@ -281,78 +380,17 @@ void VulkanManager::CreateCommandBuffer()
 {
 	commandBuffers.resize(swapChain->GetSwapChainFramebuffers().size());
 
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = commandPool;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-
-	if (vkAllocateCommandBuffers(logicalDevice->GetVKDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to allocate command buffers!");
-	}
-
 	for (size_t i = 0; i < commandBuffers.size(); i++)
 	{
-		VkCommandBufferBeginInfo beginInfo = {};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+		VkCommandBufferAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.commandPool = drawCommandPool[i];
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandBufferCount = 1;
 
-		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
+		if (vkAllocateCommandBuffers(logicalDevice->GetVKDevice(), &allocInfo, &commandBuffers[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to begin recording command buffer!");
-		}
-
-		VkRenderPassBeginInfo renderPassInfo = {};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = renderPass->GetVkRenderPass();
-		renderPassInfo.framebuffer = swapChain->GetSwapChainFramebuffers()[i];
-		renderPassInfo.renderArea.offset = {0, 0};
-		renderPassInfo.renderArea.extent = swapChain->GetVkExtent2D();
-
-		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = {clearColor.r, clearColor.g, clearColor.b, 1.0f};
-		clearValues[1].depthStencil = {1.0f, 0};
-
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
-
-		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		//TODO: make a function for that
-		// Draw model
-		auto graphicPipelineIterator = modelList.begin();
-
-		while (graphicPipelineIterator != modelList.end())
-		{
-			auto meshIterator = graphicPipelineIterator->second.begin();
-
-			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicPipelineIterator->first->GetVkPipeline());
-			
-			while (meshIterator != graphicPipelineIterator->second.end())
-			{
-				auto modelIterator = meshIterator->second.begin();
-
-				meshIterator->first->CmdBind(commandBuffers[i]);
-
-				while (modelIterator != meshIterator->second.end())
-				{
-					modelIterator->get()->Draw(commandBuffers[i], i);
-
-					modelIterator++;
-				}
-
-				meshIterator++;
-			}
-
-			graphicPipelineIterator++;
-		}
-
-		vkCmdEndRenderPass(commandBuffers[i]);
-
-		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
-		{
-			throw std::runtime_error("failed to record command buffer!");
+			throw std::runtime_error("failed to allocate command buffers!");
 		}
 	}
 }

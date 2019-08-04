@@ -88,6 +88,15 @@
   <ItemGroup>
     <ClInclude Include="src\FPSCounter.h" />
     <ClInclude Include="src\GlfwManager.h" />
+    <ClInclude Include="src\ImguiStuff.h" />
+    <ClInclude Include="src\Imgui\imconfig.h" />
+    <ClInclude Include="src\Imgui\imgui.h" />
+    <ClInclude Include="src\Imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="src\Imgui\imgui_impl_vulkan.h" />
+    <ClInclude Include="src\Imgui\imgui_internal.h" />
+    <ClInclude Include="src\Imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\Imgui\imstb_textedit.h" />
+    <ClInclude Include="src\Imgui\imstb_truetype.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Texture.h" />
@@ -107,6 +116,13 @@
   <ItemGroup>
     <ClCompile Include="src\FPSCounter.cpp" />
     <ClCompile Include="src\GlfwManager.cpp" />
+    <ClCompile Include="src\ImguiStuff.cpp" />
+    <ClCompile Include="src\Imgui\imgui.cpp" />
+    <ClCompile Include="src\Imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\Imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\Imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\Imgui\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="src\Imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Texture.cpp" />
