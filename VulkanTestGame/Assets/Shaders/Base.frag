@@ -12,17 +12,12 @@ layout(location = 3) in mat4 modelMatrix;
 layout(location = 7) in mat4 viewMatrix;
 layout(location = 11) in vec3 viewPosition;
 layout(location = 12) in mat3 TBN; // tangent bi normal
-layout(location = 15) in vec3 lightPos;
+layout(location = 15) in vec3 lightDir;
 layout(location = 16) in vec3 fragPos;
+layout(location = 17) in vec2 lightSetting;
+layout(location = 18) in vec3 lightColor;
 
 layout(location = 0) out vec4 outColor;
-
-//const vec3 lightDir = vec3(1.0, 0.0, 1.0);
-
-const float shininess = 5; // Set to lower values for matte, higher for gloss.
-const float specularity = 1; //  The amount by which to scale the specular light cast on the object.
-
-const vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
 vec3 directional_light(vec3 normal, mat3 tbn, vec3 lightColor, vec3 surface, vec3 lightDirection, mat4 modelMatrix, mat4 viewMatrix, vec3 viewPosition, float shininess, float specularity)
 {
@@ -59,11 +54,15 @@ void main()
 
 	vec4 textureColor = texture(texSampler, fragTexCoord * 2.0);
 
-	vec3 lightDir = lightPos - fragPos;
+	//vec3 lightDir = lightPos - fragPos;
 
-	float lightDistance = length(lightDir);
-	vec3 k = vec3(1.0, 0.05, 0.3) / 10.0;
+	//float lightDistance = length(lightDir);
+	//vec3 k = vec3(1.0, 0, 0);
 
-	float attenuation = 1.0 / (k.x+(k.y*lightDistance)+(k.z*lightDistance*lightDistance));
-	outColor = attenuation * vec4(directional_light(textureNormal, TBN, lightColor, textureColor.rgb, lightDir, modelMatrix, viewMatrix, viewPosition, shininess, specularity), 1.0);
+	//float attenuation = 1.0 / (k.x+(k.y*lightDistance)+(k.z*lightDistance*lightDistance));
+
+	float shininess = lightSetting.x; // Set to lower values for matte, higher for gloss.
+	float specularity = lightSetting.y; //  The amount by which to scale the specular light cast on the object.
+
+	outColor = vec4(directional_light(TBN[2], TBN, lightColor, textureColor.rgb, lightDir, modelMatrix, viewMatrix, viewPosition, shininess, specularity), 1.0);
 }

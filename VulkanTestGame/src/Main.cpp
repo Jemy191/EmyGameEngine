@@ -7,9 +7,47 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 bool demoWindowOpen = true;
-void GUI()
+float timeToUpdateFPS = 0.25f;
+float fpsUpdateTimer = timeToUpdateFPS;
+
+float camSpeed = 20;
+float lookSpeed = 0.5f;
+
+char modelToLoadInput[64] = "";
+
+bool settingWindowOpen = false;
+
+void GUI(VulkanManager* vulkanManager)
 {
 	ImGui::ShowDemoWindow(&demoWindowOpen);
+
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
+	ImGui::Begin("Setting Window", &settingWindowOpen);
+	{
+		ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
+
+		ImGui::SliderFloat("Cam speed", &camSpeed, 1, 100);
+		ImGui::SliderFloat3("Light dir", &vulkanManager->lightDir.x, -1, 1);
+
+		ImGui::SliderFloat("Light shininess", &vulkanManager->lightSetting.x, 1, 100);
+		ImGui::SliderFloat("Light spec", &vulkanManager->lightSetting.y, 0.1f, 10);
+
+		ImGui::ColorEdit3("Light color", &vulkanManager->lightColor.x);
+
+		ImGui::InputText("ModelToLoad", modelToLoadInput, IM_ARRAYSIZE(modelToLoadInput));
+		ImGui::SameLine();
+		ImGui::Text(".obj");
+		ImGui::SameLine();
+		if (ImGui::Button("Load model"))
+			vulkanManager->BasicLoadModel(std::string(modelToLoadInput));
+
+		for (size_t i = 0; i < vulkanManager->models.size(); i++)
+		{
+			ImGui::SliderFloat3((std::to_string(i) + "Transform").c_str(), &vulkanManager->models[i]->position.x, -20, 20);
+		}
+	}
+	ImGui::End();
 }
 
 #if DEBUG
@@ -18,17 +56,11 @@ int main()
 int WinMain()
 #endif
 {
+	GlfwManager glfwManager = GlfwManager(1200, 600, "TestGame");
+	VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
 
 	try
 	{
-		GlfwManager glfwManager = GlfwManager(800, 600, "TestGame");
-		VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
-		float timeToUpdateFPS = 0.25f;
-		float fpsUpdateTimer = timeToUpdateFPS;
-
-		float camSpeed = 20;
-		float lookSpeed = 0.5f;
-
 		double mousePosX, mousePosY;
 		glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
 		glm::vec2 lastMousePos = glm::vec2(mousePosX, mousePosY);
@@ -63,7 +95,7 @@ int WinMain()
 				camSpeed += 10 * FPSCounter::GetDeltaTime();
 			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
 				camSpeed += -10 * FPSCounter::GetDeltaTime();
-			
+
 			vulkanManager.camPos += dir.y * vulkanManager.camDir * camSpeed * FPSCounter::GetDeltaTime();
 			vulkanManager.camPos += dir.x * glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)) * camSpeed * FPSCounter::GetDeltaTime();
 			vulkanManager.camPos.z += dir.z * camSpeed * FPSCounter::GetDeltaTime();
@@ -83,28 +115,9 @@ int WinMain()
 
 			lastMousePos = mousePos;
 
-			// light movement
-			dir = glm::vec3(0);
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_I))
-				dir.y = 1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_J))
-				dir.x = -1;
-
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_K))
-				dir.y = -1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_L))
-				dir.x = 1;
-
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_U))
-				dir.z = -1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_O))
-				dir.z = 1;
-
-			vulkanManager.lightPos += dir * camSpeed * FPSCounter::GetDeltaTime();
-
 			vulkanManager.GetImguiStuff()->StartFrame();
 
-			GUI();
+			GUI(&vulkanManager);
 
 			vulkanManager.GetImguiStuff()->EndFrame();
 
@@ -117,7 +130,7 @@ int WinMain()
 			{
 				fpsUpdateTimer = 0;
 				std::stringstream ss;
-				ss  << "Average FPS: " << FPSCounter::GetAverageFPS()
+				ss << "Average FPS: " << FPSCounter::GetAverageFPS()
 					<< " FPS: " << FPSCounter::GetRawFPS()
 					<< " DeltaTime: " << (int)FPSCounter::GetDeltaTime()
 					<< " CamSpeed: " << camSpeed

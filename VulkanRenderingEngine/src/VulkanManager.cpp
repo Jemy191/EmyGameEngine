@@ -58,7 +58,6 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	basicGraphicPipeline->AddShader(baseVertexShader.get());
 	basicGraphicPipeline->AddShader(baseFragShader.get());
 
-
 	textureColorGraphicPipeline->AddShader(baseVertexShader.get());
 	textureColorGraphicPipeline->AddShader(textureColorFragShader.get());
 
@@ -78,10 +77,12 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), debugTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
 	testModel->position = glm::vec3(0);
 	AddModelToList(testModel);
+	models.push_back(testModel);
 
 	Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
 	cubeModel->position = glm::vec3(0);
 	AddModelToList(cubeModel);
+	models.push_back(cubeModel);
 
 	Model* planeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), planeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
 	planeModel->position = glm::vec3(0, 0, -3);
@@ -121,6 +122,12 @@ VulkanManager::~VulkanManager()
 	{
 		vkDestroyCommandPool(logicalDevice->GetVKDevice(), drawCommandPool[i], nullptr);
 	}
+
+	for (size_t i = 0; i < meshList.size(); i++)
+	{
+		delete meshList[i];
+	}
+	meshList.clear();
 
 	std::cout << "Vulkan destroyed" << std::endl;
 }
@@ -322,6 +329,17 @@ void VulkanManager::Present(GlfwManager* window)
 	vkQueueWaitIdle(logicalDevice->GetPresentQueue());
 }
 
+void VulkanManager::BasicLoadModel(std::string meshName)
+{
+	Mesh* newMesh = new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), meshName + ".obj", Mesh::MeshFormat::OBJ);
+	meshList.push_back(newMesh);
+
+	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), newMesh, debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
+	testModel->position = glm::vec3(0);
+	AddModelToList(testModel);
+	models.push_back(testModel);
+}
+
 void VulkanManager::AddModelToList(Model* model)
 {
 	using namespace std;
@@ -428,7 +446,9 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 
 	VulkanHelper::UniformBufferObject ubo = {};
 	ubo.viewPos = camPos;
-	ubo.lightPos = lightPos;
+	ubo.lightDir = lightDir;
+	ubo.lightColor = lightColor;
+	ubo.lightSetting = lightSetting;
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.0001f, 100000.0f);
 	ubo.view = glm::lookAt(camPos, camPos + glm::normalize(camDir), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj[1][1] *= -1;

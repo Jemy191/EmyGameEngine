@@ -32,7 +32,10 @@ public:
 
 	glm::vec3 camPos = glm::vec3(0, 5.0f, 0.0f);
 	glm::vec3 camDir = glm::vec3(0, -1, 0);
-	glm::vec3 lightPos = glm::vec3(0);
+	glm::vec3 lightDir = glm::vec3(0.1f, 1, 1);
+	std::vector<Model*> models = std::vector<Model*>();
+	glm::vec2 lightSetting = glm::vec2(5, 1);
+	glm::vec3 lightColor = glm::vec3(1);
 
 private:
 	GLFWwindow* window;
@@ -63,6 +66,8 @@ private:
 	std::unique_ptr<Mesh> cubeMesh;
 	std::unique_ptr<Mesh> planeMesh;
 
+	std::vector<Mesh*> meshList = std::vector<Mesh*>();
+
 	//TODO: Move this
 	std::vector <VkCommandPool> drawCommandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
@@ -81,6 +86,8 @@ public:
 	void RecreateSwapChain();
 
 	void Present(GlfwManager* window);
+
+	void BasicLoadModel(std::string meshName);
 
 	void AddModelToList(Model* model);
 	void RemoveModelFromList(Model* model);
