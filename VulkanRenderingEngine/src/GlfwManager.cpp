@@ -5,6 +5,7 @@ GlfwManager::GlfwManager(int width, int height, std::string windowName)
 {
 	glfwInit();
 
+	glfwWindowHint(GLFW_MAXIMIZED, true);
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 	window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);

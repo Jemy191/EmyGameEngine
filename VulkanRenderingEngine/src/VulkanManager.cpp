@@ -486,7 +486,6 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 				ubo.model = glm::translate(glm::mat4(1.0), modelIterator->get()->position);
 				ubo.model *= glm::mat4_cast(glm::quat(glm::radians(modelIterator->get()->rotation)));
 				ubo.model = glm::scale(ubo.model, modelIterator->get()->scale);
-				
 
 				modelIterator->get()->UpdateUniformBuffer(currentImage, &ubo);
 

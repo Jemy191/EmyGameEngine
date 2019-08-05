@@ -120,11 +120,16 @@ void Mesh::ObjLoader(std::string& meshPath)
 				attrib.vertices[3 * index.vertex_index + 2]
 			};
 
-			vertex.normal = {
-				attrib.normals[3 * index.normal_index + 0],
-				attrib.normals[3 * index.normal_index + 1],
-				attrib.normals[3 * index.normal_index + 2]
-			};
+			if (attrib.normals.size() <= 0)
+				vertex.normal = glm::vec3(1);
+			else
+			{
+				vertex.normal = {
+					attrib.normals[3 * index.normal_index + 0],
+					attrib.normals[3 * index.normal_index + 1],
+					attrib.normals[3 * index.normal_index + 2]
+				};
+			}
 
 			if (attrib.texcoords.size() <= 0)
 				vertex.texCoord = {0.0f, 1.0f};
