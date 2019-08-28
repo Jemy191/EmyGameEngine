@@ -2,6 +2,7 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <fstream>
 
 enum LogSeverity
 {
@@ -21,8 +22,7 @@ private:
 	static std::vector<std::function<void(std::string message, LogSeverity severity)>> callbacks;
 
 public:
-	static void Open(std::string name = "Log.html");
-	static void Close();
+	static void Open(std::string name = "Log");
 
 	static void Log(std::string message);
 	static void Log(LogSeverity severity, std::string message);

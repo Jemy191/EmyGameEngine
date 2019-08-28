@@ -232,7 +232,5 @@ int WinMain()
 	std::ofstream output("Assets/Scenes/Test.json");
 	output << std::setw(4) << outScene;
 
-	Logger::Close();
-
 	return 0;
 }

@@ -1,20 +1,23 @@
 #include "Log.h"
-#include <fstream>
 #include <stdexcept>
+#include <filesystem>
 #if CONSOLE
 #include <iostream>
 #endif // CONSOLE
 
 bool Logger::outputToFile = true;
+std::ofstream Logger::outputFile;
+std::vector<std::function<void(std::string message, LogSeverity severity)>> Logger::callbacks;
 
 void Logger::Open(std::string name)
 {
-	outputFile = std::ofstream(name, std::ios_base::out | std::ios_base::app);
-}
+	outputFile = std::ofstream(name + ".Log.html", std::ios_base::out);
+	outputFile << "<head>" << std::endl;
+	outputFile << "<link rel = 'stylesheet' href = 'LogStyle.css'>" << std::endl;
+	outputFile << "</head>" << std::endl;
 
-void Logger::Close()
-{
-	outputFile.close();
+	Log("Logger Open.");
+
 }
 
 void Logger::Log(std::string message)
@@ -30,15 +33,16 @@ void Logger::Log(LogSeverity severity, std::string message)
 	if (outputToFile)
 	{
 		// We absolutely need to append endl because it call flush on the file stream
-		outputFile << "<span class='Severity'>" << LogSeverityToString(severity) << "</span>: " << message << std::endl;
+		outputFile << "<span class='" << LogSeverityToString(severity) << "'>" << LogSeverityToString(severity) << "</span>: " << message << "</br>" << std::endl;
 	}
-	if(severity == LogSeverity::FATAL_ERROR)
+	if (severity == LogSeverity::FATAL_ERROR)
 		throw std::runtime_error(message);
 }
 
 void Logger::RegisterCallBack(std::function<void(std::string message, LogSeverity severity)> callback)
 {
-		Logger::callbacks.push_back(callback);
+	Logger::callbacks.push_back(callback);
+	Log("Logger callback registered.");
 }
 
 std::string Logger::LogSeverityToString(LogSeverity severity)
@@ -52,6 +56,6 @@ std::string Logger::LogSeverityToString(LogSeverity severity)
 		case ERROR:
 			return "Error";
 		case FATAL_ERROR:
-			return "Fatal Error";
+			return "Fatal_Error";
 	}
 }
