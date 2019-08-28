@@ -1,5 +1,6 @@
 #include "VulkanManager.h"
-#include <iostream>
+
+#include "Log.h"
 
 #include "VulkanHelper.h"
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,13 +14,13 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 {
 	this->window = window;
 
-	std::cout << "Start creating vulkan state" << std::endl;
+	Logger::Log("Start creating vulkan state");
 
 	vulkanInstance = std::unique_ptr<VulkanInstance>(new VulkanInstance(VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT));
 
 	if (glfwCreateWindowSurface(vulkanInstance->GetInstance(), window, nullptr, &surface) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create window surface!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create window surface!");
 	}
 
 	physicalDevice = std::unique_ptr<VulkanPhysicalDevice>(new VulkanPhysicalDevice(vulkanInstance->GetInstance(), surface, suggestedMsaaSamples));
@@ -31,7 +32,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 	if (vkCreateCommandPool(logicalDevice->GetVKDevice(), &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create graphics command pool!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create graphics command pool!");
 	}
 
 	renderPass = std::unique_ptr<VulkanRenderPass>(new VulkanRenderPass(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample()));
@@ -42,7 +43,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	{
 		if (vkCreateCommandPool(logicalDevice->GetVKDevice(), &poolInfo, nullptr, &drawCommandPool[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create graphics command pool!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to create graphics command pool!");
 		}
 	}
 
@@ -94,7 +95,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 
 	CreateSyncObject();
 
-	std::cout << "Vulkan created" << std::endl;
+	Logger::Log("Vulkan created");
 }
 
 VulkanManager::~VulkanManager()
@@ -136,7 +137,7 @@ VulkanManager::~VulkanManager()
 	}
 	textureList.clear();
 
-	std::cout << "Vulkan destroyed" << std::endl;
+	Logger::Log("Vulkan destroyed");
 }
 
 void VulkanManager::RecreateSwapChain()
@@ -204,7 +205,7 @@ void VulkanManager::Draw()
 
 		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to begin recording command buffer!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to begin recording command buffer!");
 		}
 
 		VkRenderPassBeginInfo renderPassInfo = {};
@@ -258,7 +259,7 @@ void VulkanManager::Draw()
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to record command buffer!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to record command buffer!");
 		}
 	}
 }
@@ -277,7 +278,7 @@ void VulkanManager::Present(GlfwManager* window)
 	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
 	{
-		throw std::runtime_error("failed to acquire swap chain image!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to acquire swap chain image!");
 	}
 
 	UpdateUniformBuffer(imageIndex);
@@ -303,7 +304,7 @@ void VulkanManager::Present(GlfwManager* window)
 	Draw();
 	if (vkQueueSubmit(logicalDevice->GetGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to submit draw command buffer!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to submit draw command buffer!");
 	}
 
 	VkPresentInfoKHR presentInfo = {};
@@ -327,7 +328,7 @@ void VulkanManager::Present(GlfwManager* window)
 	}
 	else if (result != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to present swap chain image!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to present swap chain image!");
 	}
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
@@ -424,7 +425,7 @@ void VulkanManager::CreateCommandBuffer()
 
 		if (vkAllocateCommandBuffers(logicalDevice->GetVKDevice(), &allocInfo, &commandBuffers[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to allocate command buffers!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to allocate command buffers!");
 		}
 	}
 }
@@ -448,7 +449,7 @@ void VulkanManager::CreateSyncObject()
 			vkCreateSemaphore(logicalDevice->GetVKDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
 			vkCreateFence(logicalDevice->GetVKDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create synchronization objects for a frame!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to create synchronization objects for a frame!");
 		}
 	}
 }

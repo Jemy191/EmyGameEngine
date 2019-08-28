@@ -1,8 +1,7 @@
 #include "VulkanShader.h"
 
-#include <stdexcept>
+#include "Log.h"
 #include <fstream>
-#include <iostream>
 #include <memory>
 
 const std::string VulkanShader::PATH = "Assets/Shaders/";
@@ -20,7 +19,7 @@ VulkanShader::VulkanShader(VkDevice device, std::string name, VkShaderStageFlagB
 
 	if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create shader module!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create shader module!");
 	}
 
 	shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -28,7 +27,7 @@ VulkanShader::VulkanShader(VkDevice device, std::string name, VkShaderStageFlagB
 	shaderStageInfo.module = shaderModule;
 	shaderStageInfo.pName = entryPointName;
 
-	std::cout << "Shader created" << std::endl;
+	Logger::Log("Shader created");
 }
 
 VulkanShader::~VulkanShader()
@@ -36,7 +35,7 @@ VulkanShader::~VulkanShader()
 	//TODO: Move this somewhere else
 	vkDestroyShaderModule(device, shaderModule, nullptr);
 
-	std::cout << "Shader destroyed" << std::endl;
+	Logger::Log("Shader destroyed");
 }
 
 VkPipelineShaderStageCreateInfo VulkanShader::GetShaderStageInfo() const
@@ -55,7 +54,7 @@ std::vector<char> VulkanShader::LoadShader(std::string fileName)
 
 	if (!file.is_open())
 	{
-		throw std::runtime_error("failed to open file!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to open file!");
 	}
 
 	size_t fileSize = (size_t)file.tellg();

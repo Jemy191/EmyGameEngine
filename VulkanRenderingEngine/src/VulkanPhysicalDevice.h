@@ -4,7 +4,6 @@
 
 #include <optional>
 #include <vector>
-#include <stdexcept>
 
 class VulkanPhysicalDevice
 {

@@ -1,5 +1,6 @@
 #include "Mesh.h"
 
+#include "Log.h"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 #define TINYGLTF_IMPLEMENTATION
@@ -8,9 +9,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <tiny_gltf.h>
 
-#include <stdexcept>
 #include <unordered_map>
-#include <iostream>
 #include <array>
 
 const std::string Mesh::PATH = "Assets/Meshs/";
@@ -85,11 +84,11 @@ void Mesh::GltfLoader(std::string& meshPath, bool isGltfBinary)
 		ret = loader.LoadASCIIFromFile(&model, &err, &warn, meshPath);
 
 	if (!warn.empty())
-		throw std::runtime_error("Warn: " + warn);
+		Logger::Log(LogSeverity::FATAL_ERROR, "Warn: " + warn);
 	if (!err.empty())
-		throw std::runtime_error("Err: " + err);
+		Logger::Log(LogSeverity::FATAL_ERROR, "Err: " + err);
 	if (!ret)
-		throw std::runtime_error("Failed to parse glTF");
+		Logger::Log(LogSeverity::FATAL_ERROR, "Failed to parse glTF");
 
 	//model.meshes[0].primitives[0].
 }
@@ -103,7 +102,7 @@ void Mesh::ObjLoader(std::string& meshPath)
 
 	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, meshPath.c_str()))
 	{
-		throw std::runtime_error(warn + err);
+		Logger::Log(LogSeverity::FATAL_ERROR, warn + err);
 	}
 
 	std::unordered_map<VulkanHelper::Vertex, uint32_t> uniqueVertices = {};
@@ -212,7 +211,7 @@ Mesh::~Mesh()
 	vkDestroyBuffer(device, indexBuffer, nullptr);
 	vkFreeMemory(device, indexBufferMemory, nullptr);
 
-	std::cout << "Mesh destroyed" << std::endl;
+	Logger::Log("Mesh destroyed");
 }
 
 void Mesh::CmdBind(VkCommandBuffer commandBuffer)

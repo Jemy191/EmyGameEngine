@@ -1,7 +1,7 @@
 #include "VulkanDescriptor.h"
 
 #include <array>
-#include <iostream>
+#include "Log.h"
 #include "VulkanHelper.h"
 
 VulkanDescriptor::VulkanDescriptor(VkDevice device, size_t swapchainImageCount, std::vector<VkBuffer> uniformBuffers, VkDescriptorSetLayout descriptorSetLayout, Texture* texture, Texture* normalTexture)
@@ -25,7 +25,7 @@ VulkanDescriptor::VulkanDescriptor(VkDevice device, size_t swapchainImageCount, 
 
 	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create descriptor pool!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create descriptor pool!");
 	}
 
 	std::vector<VkDescriptorSetLayout> layouts(swapchainImageCount, descriptorSetLayout);
@@ -38,7 +38,7 @@ VulkanDescriptor::VulkanDescriptor(VkDevice device, size_t swapchainImageCount, 
 	descriptorSets.resize(swapchainImageCount);
 	if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to allocate descriptor sets!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to allocate descriptor sets!");
 	}
 
 	for (size_t i = 0; i < swapchainImageCount; i++)
@@ -92,7 +92,7 @@ VulkanDescriptor::~VulkanDescriptor()
 {
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
-	std::cout << "Descriptor destroyed" << std::endl;
+	Logger::Log("Descriptor destroyed");
 }
 
 void VulkanDescriptor::CmdBind(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, int i)

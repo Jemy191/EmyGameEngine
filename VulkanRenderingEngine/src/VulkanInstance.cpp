@@ -1,5 +1,5 @@
 #include "VulkanInstance.h"
-#include <iostream>
+#include "Log.h"
 
 VkDebugUtilsMessageSeverityFlagBitsEXT VulkanInstance::validationLayerMessageMinSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
 
@@ -14,7 +14,7 @@ VulkanInstance::VulkanInstance(VkDebugUtilsMessageSeverityFlagBitsEXT validation
 
 	if (ENABLE_VALIDATION_LAYERS && !CheckValidationLayerSupport())
 	{
-		throw std::runtime_error("validation layers requested, but not available!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "validation layers requested, but not available!");
 	}
 
 	// Application info for optimization by driver no really use full in this engine
@@ -51,7 +51,7 @@ VulkanInstance::VulkanInstance(VkDebugUtilsMessageSeverityFlagBitsEXT validation
 
 	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create instance!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create instance!");
 	}
 
 	SetupDebugMessenger();
@@ -66,7 +66,7 @@ VulkanInstance::~VulkanInstance()
 
 	vkDestroyInstance(instance, nullptr);
 
-	std::cout << "Vulkan instance destroyed" << std::endl;
+	Logger::Log("Vulkan instance destroyed");
 }
 
 VkInstance VulkanInstance::GetInstance() const
@@ -96,7 +96,7 @@ void VulkanInstance::SetupDebugMessenger()
 
 	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to set up debug messenger!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to set up debug messenger!");
 	}
 }
 
@@ -165,25 +165,28 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanInstance::DebugCallback(VkDebugUtilsMessage
 		return VK_FALSE;
 
 	std::string severity = "Nothing";
-
+	LogSeverity severityEnum = LogSeverity::MESSAGE;
 	switch (messageSeverity)
 	{
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
 			severity = "Verbose";
+			severityEnum = LogSeverity::MESSAGE;
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
 			severity = "Info";
+			severityEnum = LogSeverity::MESSAGE;
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
 			severity = "Warning";
+			severityEnum = LogSeverity::WARNING;
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
 			severity = "Error";
+			severityEnum = LogSeverity::ERROR;
 			break;
 	}
 
 	std::string type = "None";
-
 	switch (messageType)
 	{
 		case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT:
@@ -197,8 +200,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL VulkanInstance::DebugCallback(VkDebugUtilsMessage
 			break;
 	}
 
-	//TODO: Add log print here
-	std::cerr << "Validation layer: " << severity << " " << type << " " << pCallbackData->pMessage << std::endl;
+	Logger::Log(severityEnum, "Validation layer: " + severity + " " + type + " " + pCallbackData->pMessage);
 
 	return VK_FALSE;
 }

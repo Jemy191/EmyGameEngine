@@ -2,9 +2,8 @@
 
 #include "VulkanHelper.h"
 
-#include <stdexcept>
+#include "Log.h"
 #include <array>
-#include <iostream>
 
 VulkanRenderPass::VulkanRenderPass(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSampleCountFlagBits msaaSamples)
 {
@@ -83,7 +82,7 @@ VulkanRenderPass::VulkanRenderPass(VkDevice device, VkPhysicalDevice physicalDev
 
 	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create render pass!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create render pass!");
 	}
 }
 
@@ -91,7 +90,7 @@ VulkanRenderPass::~VulkanRenderPass()
 {
 	vkDestroyRenderPass(device, renderPass, nullptr);
 
-	std::cout << "Render pass destroyed" << std::endl;
+	Logger::Log("Render pass destroyed");
 }
 
 VkRenderPass VulkanRenderPass::GetVkRenderPass() const

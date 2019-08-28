@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <set>
 #include <string>
+#include "Log.h"
 #include "VulkanHelper.h"
 
 const std::vector<const char*> VulkanPhysicalDevice::DEVICE_EXTENSIONS =
@@ -18,7 +19,7 @@ VulkanPhysicalDevice::VulkanPhysicalDevice(VkInstance instance, VkSurfaceKHR sur
 
 	if (deviceCount == 0)
 	{
-		throw std::runtime_error("failed to find GPUs with Vulkan support!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to find GPUs with Vulkan support!");
 	}
 
 	// Try to find a suitable device
@@ -44,7 +45,7 @@ VulkanPhysicalDevice::VulkanPhysicalDevice(VkInstance instance, VkSurfaceKHR sur
 
 	if (physicalDevice == VK_NULL_HANDLE)
 	{
-		throw std::runtime_error("failed to find a suitable GPU!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to find a suitable GPU!");
 	}
 }
 

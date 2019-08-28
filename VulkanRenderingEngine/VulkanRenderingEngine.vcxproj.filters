@@ -108,6 +108,9 @@
     <ClInclude Include="src\VulkanShader.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="src\Log.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Timer.cpp">
@@ -184,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="src\VulkanSwapChain.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Log.cpp">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

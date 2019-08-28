@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <set>
-#include <iostream>
+#include "Log.h"
 
 VulkanLogicalDevice::VulkanLogicalDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
 {
@@ -51,7 +51,7 @@ VulkanLogicalDevice::VulkanLogicalDevice(VkPhysicalDevice physicalDevice, VkSurf
 
 	if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create logical device!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create logical device!");
 	}
 
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
@@ -62,7 +62,7 @@ VulkanLogicalDevice::~VulkanLogicalDevice()
 {
 	vkDestroyDevice(device, nullptr);
 
-	std::cout << "Logical device destroyed" << std::endl;
+	Logger::Log("Logical device destroyed");
 }
 
 VkDevice VulkanLogicalDevice::GetVKDevice() const

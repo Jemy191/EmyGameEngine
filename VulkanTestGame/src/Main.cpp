@@ -1,4 +1,4 @@
-#include <iostream>
+#include "Log.h"
 #include <sstream>
 
 #include <GlfwManager.h>
@@ -199,7 +199,7 @@ int WinMain()
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << e.what() << std::endl;
+		Logger::Log(LogSeverity::ERROR, e.what());
 		return 1;
 	}
 

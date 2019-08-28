@@ -1,7 +1,6 @@
 #include "VulkanLayoutBinding.h"
 
-#include <stdexcept>
-#include <iostream>
+#include "Log.h"
 
 void VulkanLayoutBinding::AddLayoutBinding(VkDescriptorType descriptorType, VkShaderStageFlags stageFlags)
 {
@@ -25,7 +24,7 @@ void VulkanLayoutBinding::Create(VkDevice device)
 
 	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create descriptor set layout!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create descriptor set layout!");
 	}
 }
 
@@ -33,7 +32,7 @@ VulkanLayoutBinding::~VulkanLayoutBinding()
 {
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
-	std::cout << "LayoutBinding destroyed" << std::endl;
+	Logger::Log("LayoutBinding destroyed");
 
 }
 

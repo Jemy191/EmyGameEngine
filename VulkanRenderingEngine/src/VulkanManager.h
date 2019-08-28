@@ -3,7 +3,6 @@
 #include <GLFW/glfw3.h>
 
 #include <vector>
-#include <stdexcept>
 #include <memory>
 #include <map>
 #define GLM_FORCE_RADIANS

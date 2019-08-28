@@ -1,5 +1,5 @@
 #include "FPSCounter.h"
-#include <iostream>
+#include "Log.h"
 
 int FPSCounter::fpsArrayCurrent;
 array<int, 10> FPSCounter::fpsArray;
@@ -13,7 +13,7 @@ void FPSCounter::StartCounting()
 	timer.Start();
 	else
 	{
-		std::cout << "Stop the counter before starting it" << std::endl;
+		Logger::Log(WARNING, "Stop the counter before starting it");
 	}
 }
 

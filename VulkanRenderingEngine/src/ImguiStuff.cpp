@@ -2,7 +2,7 @@
 
 #include "VulkanHelper.h"
 
-#include <stdexcept>
+#include "Log.h"
 
 ImguiStuff::ImguiStuff(VkDevice device, GLFWwindow* window, VkInstance instance, VkPhysicalDevice physicalDevice, VkRenderPass renderPass, uint32_t queueFamily, VkQueue queue, VkCommandPool commandPool, uint32_t imageCount, uint32_t minImageCount)
 {
@@ -32,7 +32,7 @@ ImguiStuff::ImguiStuff(VkDevice device, GLFWwindow* window, VkInstance instance,
 		pool_info.pPoolSizes = pool_sizes;
 		if (vkCreateDescriptorPool(device, &pool_info, nullptr, &g_DescriptorPool) != VK_SUCCESS)
 		{
-			throw std::runtime_error("Failed to create imgui descriptorPool");
+			Logger::Log(LogSeverity::FATAL_ERROR, "Failed to create imgui descriptorPool");
 		}
 	}
 

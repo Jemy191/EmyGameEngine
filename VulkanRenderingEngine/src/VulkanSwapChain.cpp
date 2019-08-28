@@ -3,8 +3,7 @@
 #include "VulkanHelper.h"
 
 #include <algorithm>
-#include <stdexcept>
-#include <iostream>
+#include "Log.h"
 
 VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSampleCountFlagBits msaaSample, VkCommandPool commandPool, VkQueue graphicQueue, VkRenderPass renderPass)
 {
@@ -52,7 +51,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysical
 
 	if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create swap chain!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create swap chain!");
 	}
 
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
@@ -129,7 +128,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysical
 
 		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create framebuffer!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to create framebuffer!");
 		}
 	}
 }
@@ -156,7 +155,7 @@ VulkanSwapChain::~VulkanSwapChain()
 
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-	std::cout << "Swap chain destroyed" << std::endl;
+	Logger::Log("Swap chain destroyed");
 }
 
 VkSwapchainKHR VulkanSwapChain::GetVkSwapchainKHR() const

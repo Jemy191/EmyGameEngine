@@ -50,7 +50,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\VulkanSDK\1.1.108.0\Include;$(SolutionDir)Libraries\glfw-3.3.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -97,6 +97,7 @@
     <ClInclude Include="src\Imgui\imstb_rectpack.h" />
     <ClInclude Include="src\Imgui\imstb_textedit.h" />
     <ClInclude Include="src\Imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Scene.h" />
@@ -124,6 +125,7 @@
     <ClCompile Include="src\Imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\Imgui\imgui_impl_vulkan.cpp" />
     <ClCompile Include="src\Imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Scene.cpp" />

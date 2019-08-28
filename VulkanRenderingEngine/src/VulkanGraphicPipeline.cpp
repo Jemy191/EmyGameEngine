@@ -1,6 +1,6 @@
 #include "VulkanGraphicPipeline.h"
 
-#include <iostream>
+#include "Log.h"
 
 #include "VulkanHelper.h"
 
@@ -99,7 +99,7 @@ void VulkanGraphicPipeline::Create(VkDevice device, VkExtent2D swapChainExtent, 
 
 	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create pipeline layout!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create pipeline layout!");
 	}
 
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
@@ -120,7 +120,7 @@ void VulkanGraphicPipeline::Create(VkDevice device, VkExtent2D swapChainExtent, 
 
 	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create graphics pipeline!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create graphics pipeline!");
 	}
 }
 
@@ -129,7 +129,7 @@ VulkanGraphicPipeline::~VulkanGraphicPipeline()
 	vkDestroyPipeline(device, graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 
-	std::cout << "Graphic pipeline destroyed" << std::endl;
+	Logger::Log("Graphic pipeline destroyed");
 }
 
 bool VulkanGraphicPipeline::AddShader(VulkanShader* shader, bool replace)

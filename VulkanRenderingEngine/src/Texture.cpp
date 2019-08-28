@@ -3,10 +3,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <stdexcept>
+#include "Log.h"
 #include <cmath>
 #include <algorithm>
-#include <iostream>
+#include "Log.h"
 
 #include "VulkanHelper.h"
 
@@ -27,7 +27,7 @@ Texture::Texture(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool
 
 	if (!pixels)
 	{
-		throw std::runtime_error("failed to load: "+ filename +" texture image!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to load: "+ filename +" texture image!");
 	}
 
 	VkBuffer stagingBuffer;
@@ -94,7 +94,7 @@ Texture::Texture(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool
 
 	if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create texture sampler!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create texture sampler!");
 	}
 }
 
@@ -105,7 +105,7 @@ Texture::~Texture()
 	vkDestroyImageView(device, textureImageView, nullptr);
 	vkDestroySampler(device, textureSampler, nullptr);
 
-	std::cout << "Texture destroyed" << std::endl;
+	Logger::Log("Texture destroyed");
 }
 
 bool Texture::GetHasAlpha() const

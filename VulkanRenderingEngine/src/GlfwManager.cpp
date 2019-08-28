@@ -1,5 +1,5 @@
 #include "GlfwManager.h"
-#include <iostream>
+#include "Log.h"
 
 GlfwManager::GlfwManager(int width, int height, std::string windowName)
 {
@@ -18,7 +18,7 @@ GlfwManager::~GlfwManager()
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
-	std::cout << "GLFW destroyed" << std::endl;
+	Logger::Log("GLFW destroyed");
 }
 
 void GlfwManager::SetWindowTitle(std::string name)

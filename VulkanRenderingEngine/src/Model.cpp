@@ -1,5 +1,5 @@
 #include "Model.h"
-#include <iostream>
+#include "Log.h"
 
 Model::Model(VkDevice device, VkPhysicalDevice physicalDevice, size_t swapchainImagesSize, Mesh* mesh, Texture* texture, Texture* normalTexture, VulkanGraphicPipeline* graphicPipeline)
 	: device(device), physicalDevice(physicalDevice), mesh(mesh), texture(texture), normalTexture(normalTexture), graphicPipeline(graphicPipeline)
@@ -10,7 +10,7 @@ Model::Model(VkDevice device, VkPhysicalDevice physicalDevice, size_t swapchainI
 Model::~Model()
 {
 	Cleanup();
-	std::cout << "Model deleted" << std::endl;
+	Logger::Log("Model deleted");
 }
 
 void Model::Draw(VkCommandBuffer commandBuffer, int i)

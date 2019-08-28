@@ -1,6 +1,7 @@
 #include "VulkanHelper.h"
 
-#include <stdexcept>
+#include "Log.h"
+
 namespace VulkanHelper
 {
 	QueueFamilyIndices VulkanHelper::FindQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
@@ -94,7 +95,7 @@ namespace VulkanHelper
 		VkImageView imageView;
 		if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create texture image view!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to create texture image view!");
 		}
 
 		return imageView;
@@ -119,7 +120,7 @@ namespace VulkanHelper
 
 		if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create image!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to create image!");
 		}
 
 		VkMemoryRequirements memRequirements;
@@ -132,7 +133,7 @@ namespace VulkanHelper
 
 		if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to allocate image memory!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to allocate image memory!");
 		}
 
 		vkBindImageMemory(device, image, imageMemory, 0);
@@ -151,7 +152,7 @@ namespace VulkanHelper
 			}
 		}
 
-		throw std::runtime_error("failed to find suitable memory type!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to find suitable memory type!");
 	}
 
 	void VulkanHelper::CreateTexture(CreateTextureParameter& parameter, VkImage& image, VkImageView& imageView, VkDeviceMemory& imageMemory)
@@ -253,7 +254,7 @@ namespace VulkanHelper
 
 		if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create buffer!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to create buffer!");
 		}
 
 		VkMemoryRequirements memRequirements;
@@ -266,7 +267,7 @@ namespace VulkanHelper
 
 		if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to allocate buffer memory!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "failed to allocate buffer memory!");
 		}
 
 		vkBindBufferMemory(device, buffer, bufferMemory, 0);
@@ -304,7 +305,7 @@ namespace VulkanHelper
 
 		if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
 		{
-			throw std::runtime_error("texture image format does not support linear blitting!");
+			Logger::Log(LogSeverity::FATAL_ERROR, "texture image format does not support linear blitting!");
 		}
 
 		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, commandPool);
@@ -463,7 +464,7 @@ namespace VulkanHelper
 			}
 		}
 
-		throw std::runtime_error("failed to find supported format!");
+		Logger::Log(LogSeverity::FATAL_ERROR, "failed to find supported format!");
 	}
 
 	VkVertexInputBindingDescription Vertex::GetBindingDescription()
