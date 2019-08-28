@@ -11,6 +11,8 @@ GlfwManager::GlfwManager(int width, int height, std::string windowName)
 	window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
 	glfwSetWindowUserPointer(window, this);
 	glfwSetFramebufferSizeCallback(window, FramebufferResizeCallback);
+
+	Logger::Log("GLFW manager init");
 }
 
 GlfwManager::~GlfwManager()

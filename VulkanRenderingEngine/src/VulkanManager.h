@@ -61,7 +61,7 @@ private:
 	std::unique_ptr<Texture> debugTexture;
 	std::unique_ptr<Texture> debugNormalTexture;
 	std::unique_ptr<Texture> testNormalTexture;
-	std::unique_ptr<Mesh> textMesh;
+	std::unique_ptr<Mesh> skyboxMesh;
 	std::unique_ptr<Mesh> cubeMesh;
 	std::unique_ptr<Mesh> planeMesh;
 

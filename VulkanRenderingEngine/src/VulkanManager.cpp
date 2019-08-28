@@ -16,16 +16,22 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 
 	Logger::Log("Start creating vulkan state");
 
+	Logger::Log("Creating instance");
 	vulkanInstance = std::unique_ptr<VulkanInstance>(new VulkanInstance(VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT));
 
+	Logger::Log("Creating surface");
 	if (glfwCreateWindowSurface(vulkanInstance->GetInstance(), window, nullptr, &surface) != VK_SUCCESS)
 	{
 		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create window surface!");
 	}
 
+	Logger::Log("Creating physicalDevice");
 	physicalDevice = std::unique_ptr<VulkanPhysicalDevice>(new VulkanPhysicalDevice(vulkanInstance->GetInstance(), surface, suggestedMsaaSamples));
+
+	Logger::Log("Creating logicalDevice");
 	logicalDevice = std::unique_ptr<VulkanLogicalDevice>(new VulkanLogicalDevice(physicalDevice->GetVKPhysicalDevice(), surface));
 
+	Logger::Log("Creating commandPool");
 	VulkanHelper::QueueFamilyIndices queueFamilyIndices = VulkanHelper::FindQueueFamilies(physicalDevice->GetVKPhysicalDevice(), surface);
 	VkCommandPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -35,9 +41,13 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create graphics command pool!");
 	}
 
+	Logger::Log("Creating renderPass");
 	renderPass = std::unique_ptr<VulkanRenderPass>(new VulkanRenderPass(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample()));
+
+	Logger::Log("Creating swapChain");
 	swapChain = std::unique_ptr<VulkanSwapChain>(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), commandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
 
+	Logger::Log("Creating drawCommandPools");
 	drawCommandPool.resize(swapChain->GetSwapChainFramebuffers().size());
 	for (size_t i = 0; i < swapChain->GetSwapChainFramebuffers().size(); i++)
 	{
@@ -47,37 +57,39 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 		}
 	}
 
+	Logger::Log("Creating imgui");
 	uint32_t minImageCount = VulkanHelper::QuerySwapChainSupport(physicalDevice->GetVKPhysicalDevice(), surface).capabilities.minImageCount + 1;
 	imguiStuff = std::unique_ptr<ImguiStuff>(new ImguiStuff(logicalDevice->GetVKDevice(), window, vulkanInstance->GetInstance(), physicalDevice->GetVKPhysicalDevice(), renderPass->GetVkRenderPass(), queueFamilyIndices.graphicsFamily.value(), logicalDevice->GetGraphicsQueue(), commandPool, (uint32_t)(swapChain->GetVkImages().size()), minImageCount));
 
+	Logger::Log("Creating test shader");
 	// TestMesh and shader
 	baseVertexShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "BaseVert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT));
 	baseFragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "BaseFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
 	textureColorFragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "TextureColorFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
 
+	Logger::Log("Creating test GraphicPipeline");
 	basicGraphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
-	textureColorGraphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
-
 	basicGraphicPipeline->AddShader(baseVertexShader.get());
 	basicGraphicPipeline->AddShader(baseFragShader.get());
+	basicGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 
+	textureColorGraphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
 	textureColorGraphicPipeline->AddShader(baseVertexShader.get());
 	textureColorGraphicPipeline->AddShader(textureColorFragShader.get());
-
-	basicGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 	textureColorGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 
+	Logger::Log("Creating test texture");
 	checkerTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Checker.jpg"));
 	debugTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Debug.jpg"));
-
 	debugNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "DebugNormalMap.jpg"));
 	//testNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "TestNormalMap.png"));
 
-	textMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
+	Logger::Log("Creating test skybox");
+	skyboxMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
 	//cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "MultiCube.obj", Mesh::MeshFormat::OBJ));
 	//planeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Plane.obj", Mesh::MeshFormat::OBJ));
 	//
-	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), textMesh.get(), debugTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
+	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), skyboxMesh.get(), debugTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
 	testModel->position = glm::vec3(0);
 	AddModelToList(testModel);
 
@@ -91,8 +103,10 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	//planeModel->position = glm::vec3(0, 0, -3);
 	//AddModelToList(planeModel);
 
+	Logger::Log("Creating Command buffer");
 	CreateCommandBuffer();
 
+	Logger::Log("Creating sync object");
 	CreateSyncObject();
 
 	Logger::Log("Vulkan created");
@@ -100,7 +114,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 
 VulkanManager::~VulkanManager()
 {
-	textMesh.reset();
+	skyboxMesh.reset();
 	swapChain.reset();
 	modelList.clear();
 	vkDestroySurfaceKHR(vulkanInstance->GetInstance(), surface, nullptr);
