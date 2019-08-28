@@ -108,6 +108,7 @@ int main()
 int WinMain()
 #endif
 {
+	Logger::Open();
 	GlfwManager glfwManager = GlfwManager(1600, 900, "TestGame");
 	VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
 
@@ -227,8 +228,11 @@ int WinMain()
 		outScene["scene"]["models"].push_back(model);
 	}
 
+	// save scene
 	std::ofstream output("Assets/Scenes/Test.json");
 	output << std::setw(4) << outScene;
+
+	Logger::Close();
 
 	return 0;
 }
