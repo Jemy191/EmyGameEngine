@@ -127,10 +127,7 @@ void GUI(VulkanManager* vulkanManager)
 			{
 				if (ImGui::Button("Add Scene Object"))
 				{
-					for (size_t i = 0; i < 1000; i++)
-					{
-						scene->Add(new SceneObject());
-					}
+					scene->Add(new SceneObject());
 				}
 
 				if (ImGui::Button("Save Scene"))
