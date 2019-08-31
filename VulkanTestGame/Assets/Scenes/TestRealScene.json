@@ -1,0 +1,31 @@
+{
+    "Scene": {
+        "IDCounter": 6,
+        "Model": [
+            {
+                "ID": 0,
+                "name": "Unamed"
+            },
+            {
+                "ID": 1,
+                "name": "Unamed"
+            },
+            {
+                "ID": 2,
+                "name": "Unamed"
+            },
+            {
+                "ID": 3,
+                "name": "Unamed"
+            },
+            {
+                "ID": 4,
+                "name": "Unamed"
+            },
+            {
+                "ID": 5,
+                "name": "Unamed"
+            }
+        ]
+    }
+}

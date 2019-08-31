@@ -94,6 +94,7 @@
     <ClInclude Include="src\Imgui\imgui_impl_glfw.h" />
     <ClInclude Include="src\Imgui\imgui_impl_vulkan.h" />
     <ClInclude Include="src\Imgui\imgui_internal.h" />
+    <ClInclude Include="src\Imgui\imgui_stdlib.h" />
     <ClInclude Include="src\Imgui\imstb_rectpack.h" />
     <ClInclude Include="src\Imgui\imstb_textedit.h" />
     <ClInclude Include="src\Imgui\imstb_truetype.h" />
@@ -101,8 +102,11 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\SceneObject.h" />
+    <ClInclude Include="src\SceneObjectReference.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Timer.h" />
+    <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\VulkanDescriptor.h" />
     <ClInclude Include="src\VulkanPhysicalDevice.h" />
     <ClInclude Include="src\VulkanHelper.h" />
@@ -124,13 +128,17 @@
     <ClCompile Include="src\Imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\Imgui\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="src\Imgui\imgui_stdlib.cpp" />
     <ClCompile Include="src\Imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\SceneObject.cpp" />
+    <ClCompile Include="src\SceneObjectReference.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Timer.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\VulkanDescriptor.cpp" />
     <ClCompile Include="src\VulkanPhysicalDevice.cpp" />
     <ClCompile Include="src\VulkanHelper.cpp" />

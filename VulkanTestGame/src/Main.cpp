@@ -9,6 +9,8 @@
 #include <fstream>
 #include <iomanip>
 #include <glm/gtc/type_ptr.hpp>
+#include <Scene.h>
+#include "Imgui/imgui_internal.h"
 
 float camSpeed = 20;
 float lookSpeed = 0.5f;
@@ -18,7 +20,10 @@ char textureToLoadInput[64] = "";
 
 bool demoWindowOpen = false;
 bool settingWindowOpen = false;
+bool hierarchyWindowOpen = true;
 bool statWindowOpen = false;
+
+Scene scene("TestRealScene");
 
 void GUI(VulkanManager* vulkanManager)
 {
@@ -38,6 +43,8 @@ void GUI(VulkanManager* vulkanManager)
 				statWindowOpen = true;
 			if (ImGui::MenuItem("Demo"))
 				demoWindowOpen = true;
+			if (ImGui::MenuItem("Scene"))
+				hierarchyWindowOpen = true;
 
 			ImGui::EndMenu();
 		}
@@ -83,6 +90,32 @@ void GUI(VulkanManager* vulkanManager)
 						ImGui::TreePop();
 					}
 				}
+			}
+		}
+		ImGui::End();
+	}
+
+	if (hierarchyWindowOpen)
+	{
+		ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Hierarchy Window", &hierarchyWindowOpen))
+		{
+			ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
+
+			if (ImGui::Button("Add Scene Object"))
+			{
+				scene.Add(new SceneObject());
+			}
+
+			if (ImGui::Button("Save Scene"))
+			{
+				scene.Save();
+			}
+
+			for (size_t i = 0; i < scene.GetRootSceneObjectSize(); i++)
+			{
+				ImGui::Text((scene.GetRootSceneObject(i)->name).c_str());
+				ImGui::InputText(("Name##" + std::to_string(scene.GetRootSceneObject(i)->GetID())).c_str(), &scene.GetRootSceneObject(i)->name);
 			}
 		}
 		ImGui::End();
@@ -140,51 +173,54 @@ int WinMain()
 			glfwPollEvents();
 			FPSCounter::StartCounting();
 
-			//cam movement
-			glm::vec3 dir = glm::vec3(0);
-
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_ESCAPE))
-				break;
-
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
-				dir.y = 1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
-				dir.x = -1;
-
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
-				dir.y = -1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
-				dir.x = 1;
-
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_Q))
-				dir.z = -1;
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
-				dir.z = 1;
-
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_UP))
-				camSpeed += 10 * FPSCounter::GetDeltaTime();
-			if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
-				camSpeed += -10 * FPSCounter::GetDeltaTime();
-
-			vulkanManager.camPos += dir.y * vulkanManager.camDir * camSpeed * FPSCounter::GetDeltaTime();
-			vulkanManager.camPos += dir.x * glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)) * camSpeed * FPSCounter::GetDeltaTime();
-			vulkanManager.camPos.z += dir.z * camSpeed * FPSCounter::GetDeltaTime();
-
-			// cam rotation
-			double mousePosX, mousePosY;
-			glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
-			glm::vec2 mousePos = glm::vec2(mousePosX, mousePosY);
-
-			glm::vec2 mouseDelta = lastMousePos - mousePos;
-
-			glm::vec3 rot(0);
-			if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
+			if (!ImGui::GetCurrentContext()->NavWindow)
 			{
-				vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.x * lookSpeed * FPSCounter::GetDeltaTime(), glm::vec3(0, 0, 1));
-				vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.y * lookSpeed * FPSCounter::GetDeltaTime(), glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)));
-			}
+				//cam movement
+				glm::vec3 dir = glm::vec3(0);
 
-			lastMousePos = mousePos;
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_ESCAPE))
+					break;
+
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
+					dir.y = 1;
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
+					dir.x = -1;
+
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
+					dir.y = -1;
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
+					dir.x = 1;
+
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_Q))
+					dir.z = -1;
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
+					dir.z = 1;
+
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_UP))
+					camSpeed += 10 * FPSCounter::GetDeltaTime();
+				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
+					camSpeed += -10 * FPSCounter::GetDeltaTime();
+
+				vulkanManager.camPos += dir.y * vulkanManager.camDir * camSpeed * FPSCounter::GetDeltaTime();
+				vulkanManager.camPos += dir.x * glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)) * camSpeed * FPSCounter::GetDeltaTime();
+				vulkanManager.camPos.z += dir.z * camSpeed * FPSCounter::GetDeltaTime();
+
+				// cam rotation
+				double mousePosX, mousePosY;
+				glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
+				glm::vec2 mousePos = glm::vec2(mousePosX, mousePosY);
+
+				glm::vec2 mouseDelta = lastMousePos - mousePos;
+
+				glm::vec3 rot(0);
+				if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
+				{
+					vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.x * lookSpeed * FPSCounter::GetDeltaTime(), glm::vec3(0, 0, 1));
+					vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.y * lookSpeed * FPSCounter::GetDeltaTime(), glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)));
+				}
+
+				lastMousePos = mousePos;
+			}
 
 			vulkanManager.GetImguiStuff()->StartFrame();
 
