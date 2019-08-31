@@ -22,7 +22,7 @@ public:
 	~Scene();
 
 	void Add(SceneObject* sceneObject);
-	void AddToRootObject(SceneObject* sceneObject);
+	void AddToRootObject(SceneObject* sceneObject);//TODO Change this
 	void Remove(SceneObject* sceneObject);
 
 	static Scene* GetCurrentScene();
@@ -34,5 +34,7 @@ public:
 	static void IncrementIDCounter();
 
 	void Save();
+
+private:
 	void Load();
 };

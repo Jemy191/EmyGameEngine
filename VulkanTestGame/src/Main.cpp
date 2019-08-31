@@ -10,20 +10,21 @@
 #include <iomanip>
 #include <glm/gtc/type_ptr.hpp>
 #include <Scene.h>
+#include "ImguiStuff.h"
 #include "Imgui/imgui_internal.h"
+#include <filesystem>
 
 float camSpeed = 20;
 float lookSpeed = 0.5f;
 
 char meshToLoadInput[64] = "";
 char textureToLoadInput[64] = "";
+std::string sceneToLoad = "TestRealScene";
 
 bool demoWindowOpen = false;
 bool settingWindowOpen = false;
 bool hierarchyWindowOpen = true;
 bool statWindowOpen = false;
-
-Scene scene("TestRealScene");
 
 void GUI(VulkanManager* vulkanManager)
 {
@@ -102,20 +103,60 @@ void GUI(VulkanManager* vulkanManager)
 		{
 			ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
 
-			if (ImGui::Button("Add Scene Object"))
+			ImGui::InputText("##LoadScene", &sceneToLoad);
+			ImGui::SameLine();
+			if (std::filesystem::exists("Assets/Scenes/" + sceneToLoad + ".json"))
 			{
-				scene.Add(new SceneObject());
+				if (ImGui::Button("Load"))
+				{
+					new Scene(sceneToLoad);
+					sceneToLoad = "";
+				}
+			}
+			else
+			{
+				if (ImGui::Button("Create"))
+				{
+					new Scene(sceneToLoad);
+					sceneToLoad = "";
+				}
 			}
 
-			if (ImGui::Button("Save Scene"))
+			Scene* scene = Scene::GetCurrentScene();
+			if (scene != nullptr)
 			{
-				scene.Save();
-			}
+				if (ImGui::Button("Add Scene Object"))
+				{
+					for (size_t i = 0; i < 1000; i++)
+					{
+						scene->Add(new SceneObject());
+					}
+				}
 
-			for (size_t i = 0; i < scene.GetRootSceneObjectSize(); i++)
-			{
-				ImGui::Text((scene.GetRootSceneObject(i)->name).c_str());
-				ImGui::InputText(("Name##" + std::to_string(scene.GetRootSceneObject(i)->GetID())).c_str(), &scene.GetRootSceneObject(i)->name);
+				if (ImGui::Button("Save Scene"))
+					scene->Save();
+
+				for (size_t i = 0; i < scene->GetRootSceneObjectSize(); i++)
+				{
+					SceneObject* sceneObject = scene->GetRootSceneObject(i);
+
+					if (ImGui::TreeNode((sceneObject->name + "###" + std::to_string(sceneObject->GetID())).c_str()))
+					{
+						ImGui::Text(std::to_string(sceneObject->GetID()).c_str());
+						ImGui::SameLine();
+						if (ImGui::Button("Delete"))
+						{
+							scene->Remove(sceneObject);
+							ImGui::TreePop();// temporary
+							continue;
+						}
+						ImGui::InputText("Name", &sceneObject->name);
+
+						sceneObject->transform.GUI();
+
+						ImGui::TreePop();
+					}
+				}
 			}
 		}
 		ImGui::End();

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
+#include "Log.h"
 
 Scene* Scene::currentScene = nullptr;
 uint64_t Scene::IDCounter = 0;
@@ -13,6 +14,7 @@ Scene::Scene(std::string name)
 {
 	this->name = name;
 	currentScene = this;
+	Load();
 }
 
 Scene::~Scene()
@@ -28,11 +30,21 @@ void Scene::Add(SceneObject* sceneObject)
 
 void Scene::AddToRootObject(SceneObject* sceneObject)
 {
+	for (auto it = sceneObjectAtRoot.begin(); it != sceneObjectAtRoot.end(); it++)
+	{
+		if ((*it) == sceneObject)
+		{
+			return;
+		}
+	}
 	sceneObjectAtRoot.push_back(sceneObject);
 }
 
 void Scene::Remove(SceneObject* sceneObject)
 {
+	if (sceneObject == nullptr)
+		return;
+
 	sceneObjects.erase(sceneObject->GetID());
 	sceneObject->SetParent(nullptr);
 	for (auto it = sceneObjectAtRoot.begin(); it != sceneObjectAtRoot.end(); it++)
@@ -40,6 +52,7 @@ void Scene::Remove(SceneObject* sceneObject)
 		if ((*it) == sceneObject)
 		{
 			sceneObjectAtRoot.erase(it);
+			Logger::Log("Scene object remove from scene.");
 			break;
 		}
 	}
@@ -81,35 +94,14 @@ void Scene::Save()
 {
 	using json = nlohmann::json;
 
-	// Save scene
 	json outScene;
 
 	outScene["Scene"]["IDCounter"] = IDCounter;
 
 	for (auto it = sceneObjects.begin(); it != sceneObjects.end(); it++)
 	{
-		outScene["Scene"]["Model"].push_back((*it).second->Save());
+		outScene["Scene"]["SceneObject"].push_back((*it).second->Save());
 	}
-	/*for (size_t i = 0; i < sceneObjects.size(); i++)
-	{
-		json model;
-		model["position"]["x"] = vulkanManager.models[i]->position.x;
-		model["position"]["y"] = vulkanManager.models[i]->position.y;
-		model["position"]["z"] = vulkanManager.models[i]->position.z;
-
-		model["rotation"]["x"] = vulkanManager.models[i]->rotation.x;
-		model["rotation"]["y"] = vulkanManager.models[i]->rotation.y;
-		model["rotation"]["z"] = vulkanManager.models[i]->rotation.z;
-
-		model["scale"]["x"] = vulkanManager.models[i]->scale.x;
-		model["scale"]["y"] = vulkanManager.models[i]->scale.y;
-		model["scale"]["z"] = vulkanManager.models[i]->scale.z;
-
-		model["mesh"] = vulkanManager.models[i]->meshName;
-		model["texture"] = vulkanManager.models[i]->textureName;
-
-		outScene["scene"]["models"].push_back(model);
-	}*/
 
 	// save scene
 	std::ofstream output(PATH + name + ".json");
@@ -118,4 +110,23 @@ void Scene::Save()
 
 void Scene::Load()
 {
+	using json = nlohmann::json;
+
+	std::ifstream input("Assets/Scenes/" + name + ".json");
+	
+	if (input.fail())
+	{
+		Logger::Log("Unable to open " + name + ".json scene file");
+		return;
+	}
+
+	json scene;
+	input >> scene;
+
+	IDCounter = scene["Scene"]["IDCounter"];
+
+	for (auto sceneObjectData : scene["Scene"]["SceneObject"])
+	{
+		Add(new SceneObject(sceneObjectData));
+	}
 }

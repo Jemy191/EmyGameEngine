@@ -75,9 +75,6 @@
     <ClInclude Include="src\Imgui\imstb_truetype.h">
       <Filter>Fichiers d%27en-tête\Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\ImguiStuff.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="src\VulkanSwapChain.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
@@ -129,6 +126,9 @@
     <ClInclude Include="src\Imgui\imgui_stdlib.h">
       <Filter>Fichiers d%27en-tête\Imgui</Filter>
     </ClInclude>
+    <ClInclude Include="src\ImguiStuff.h">
+      <Filter>Fichiers d%27en-tête\Imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Timer.cpp">
@@ -163,9 +163,6 @@
     </ClCompile>
     <ClCompile Include="src\Imgui\imgui_widgets.cpp">
       <Filter>Fichiers sources\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImguiStuff.cpp">
-      <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="src\Imgui\imgui_demo.cpp">
       <Filter>Fichiers sources\Imgui</Filter>
@@ -219,6 +216,9 @@
       <Filter>Fichiers sources\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Imgui\imgui_stdlib.cpp">
+      <Filter>Fichiers sources\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImguiStuff.cpp">
       <Filter>Fichiers sources\Imgui</Filter>
     </ClCompile>
   </ItemGroup>

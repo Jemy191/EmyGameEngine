@@ -1,30 +1,69 @@
 {
     "Scene": {
-        "IDCounter": 6,
-        "Model": [
+        "IDCounter": 4,
+        "SceneObject": [
             {
                 "ID": 0,
-                "name": "Unamed"
+                "Name": "Unameddgsgf",
+                "Transform": {
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 47.0,
+                        "z": 0.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                }
             },
             {
                 "ID": 1,
-                "name": "Unamed"
-            },
-            {
-                "ID": 2,
-                "name": "Unamed"
+                "Name": "Unamed",
+                "Transform": {
+                    "position": {
+                        "x": 0.0,
+                        "y": 20.0,
+                        "z": -20.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": -5.0,
+                        "z": 1.0
+                    }
+                }
             },
             {
                 "ID": 3,
-                "name": "Unamed"
-            },
-            {
-                "ID": 4,
-                "name": "Unamed"
-            },
-            {
-                "ID": 5,
-                "name": "Unamed"
+                "Name": "Unamed",
+                "Transform": {
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                }
             }
         ]
     }

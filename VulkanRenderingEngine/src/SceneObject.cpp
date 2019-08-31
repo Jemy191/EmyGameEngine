@@ -5,14 +5,12 @@
 SceneObject::SceneObject()
 {
 	ID = Scene::GetIDCounter();
-	Logger::Log("SceneObject created with id: " + std::to_string(ID));
 	Scene::IncrementIDCounter();
 }
 
-SceneObject::SceneObject(uint64_t ID)
+SceneObject::SceneObject(nlohmann::json sceneObject)
 {
-	this->ID = ID;
-	Logger::Log("SceneObject loaded with id: " + std::to_string(ID));
+	Load(sceneObject);
 }
 
 SceneObject::~SceneObject()
@@ -58,11 +56,17 @@ nlohmann::json SceneObject::Save()
 	json sceneObject;
 
 	sceneObject["ID"] = ID;
-	sceneObject["name"] = name;
+	sceneObject["Name"] = name;
+	sceneObject["Transform"] = transform.Save();
 
 	return sceneObject;
 }
 
-void SceneObject::Load(nlohmann::json scene)
+void SceneObject::Load(nlohmann::json sceneObject)
 {
+	ID = sceneObject["ID"];
+	name = sceneObject["Name"];
+
+	nlohmann::json transformData = sceneObject["Transform"];
+	transform = Transform(transformData);
 }

@@ -18,7 +18,7 @@ public:
 	std::unordered_map<uint64_t, SceneObjectReference> childs;
 
 	SceneObject();
-	SceneObject(uint64_t ID);
+	SceneObject(nlohmann::json sceneObject);
 	~SceneObject();
 
 	void SetParent(SceneObject* newParent);
@@ -28,7 +28,9 @@ public:
 	uint64_t GetID() const;
 
 	virtual nlohmann::json Save();
-	virtual void Load(nlohmann::json scene);
+
+private:
+	virtual void Load(nlohmann::json sceneObject);
 
 private:
 

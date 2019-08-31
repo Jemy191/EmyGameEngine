@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <json.hpp>
 
 class Transform
 {
@@ -9,8 +10,10 @@ public:
 	glm::vec3 scale = glm::vec3(1);
 
 	Transform();
+	Transform(nlohmann::json transform);
 	~Transform();
 
-private:
+	nlohmann::json Save();
+	void GUI();
 
 };
