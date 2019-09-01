@@ -1,6 +1,6 @@
 {
     "Scene": {
-        "IDCounter": 5,
+        "IDCounter": 8,
         "SceneObject": [
             {
                 "ClassType": "SceneModel",
@@ -42,7 +42,34 @@
                     "position": {
                         "x": 0.0,
                         "y": 0.0,
+                        "z": -1.5
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
                         "z": 0.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    }
+                }
+            },
+            {
+                "ClassType": "SceneModel",
+                "ID": 7,
+                "Model": {
+                    "Mesh": "MultiCube",
+                    "ModelSaved": true,
+                    "Texture": "Debug.jpg"
+                },
+                "Name": "MultiCube",
+                "Transform": {
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 1.5
                     },
                     "rotation": {
                         "x": 0.0,

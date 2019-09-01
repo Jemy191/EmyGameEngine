@@ -89,6 +89,8 @@ void GUI(VulkanManager* vulkanManager)
 
 				if (ImGui::Button(buttonText.c_str()))
 				{
+					if(Scene::GetCurrentScene() != nullptr)
+						delete Scene::GetCurrentScene();
 					new Scene(sceneToLoad);
 					sceneToLoad = "";
 				}

@@ -21,6 +21,10 @@ Scene::Scene(std::string name)
 
 Scene::~Scene()
 {
+	for (auto it = sceneObjects.begin(); it != sceneObjects.end(); it++)
+	{
+		delete (*it).second;
+	}
 }
 
 void Scene::Add(SceneObject* sceneObject)
