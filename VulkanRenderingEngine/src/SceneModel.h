@@ -6,7 +6,7 @@
 class SceneModel : public SceneObject
 {
 private:
-	Model* model;
+	Model* model = nullptr;
 
 	std::string meshToLoadInput;
 	std::string textureToLoadInput;
