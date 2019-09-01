@@ -32,11 +32,12 @@ public:
 	glm::vec3 camPos = glm::vec3(0, 5.0f, 0.0f);
 	glm::vec3 camDir = glm::vec3(0, -1, 0);
 	glm::vec3 lightDir = glm::vec3(0.1f, 1, 1);
-	std::vector<Model*> models = std::vector<Model*>();
 	glm::vec2 lightSetting = glm::vec2(5, 1);
 	glm::vec3 lightColor = glm::vec3(1);
 
 private:
+	static VulkanManager* instance;
+
 	GLFWwindow* window;
 
 	std::unique_ptr<VulkanInstance> vulkanInstance;
@@ -79,6 +80,8 @@ private:
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
 
+	std::vector<Model*> modelToBeRemove;
+
 public:
 	VulkanManager(GLFWwindow* window, VkSampleCountFlagBits msaaSamples);
 	~VulkanManager();
@@ -87,17 +90,20 @@ public:
 
 	void Present(GlfwManager* window);
 
-	void BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+	Model* BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+	void MarkModelToBeRemove(Model* model);
 
 	void AddModelToList(Model* model);
-	void RemoveModelFromList(Model* model);
 
 	VulkanInstance* GetVulkanInstance() const;
 	VkSurfaceKHR GetVkSurfaceKHR() const;
 	ImguiStuff* GetImguiStuff() const;
 	void WaitForIdle();
 
+	static VulkanManager* GetInstance();
+
 private:
+	void RemoveModelFromList(Model* model);
 	void Draw();
 
 	void CreateCommandBuffer();// TODO: Not here?

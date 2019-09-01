@@ -10,8 +10,14 @@
 #include <chrono>
 #include <algorithm>
 
+VulkanManager* VulkanManager::instance = nullptr;
+
 VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggestedMsaaSamples)
 {
+	if (instance != nullptr)
+		Logger::Log(LogSeverity::FATAL_ERROR, "There cant be 2 VulkanManager");
+
+	instance = this;
 	this->window = window;
 
 	Logger::Log("Start creating vulkan state");
@@ -280,6 +286,16 @@ void VulkanManager::Draw()
 
 void VulkanManager::Present(GlfwManager* window)
 {
+	// Remove model from model list
+	if (modelToBeRemove.size() != 0)
+	{
+		for (size_t i = 0; i < modelToBeRemove.size(); i++)
+		{
+			RemoveModelFromList(modelToBeRemove[i]);
+		}
+		modelToBeRemove.clear();
+	}
+
 	vkWaitForFences(logicalDevice->GetVKDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 	uint32_t imageIndex;
@@ -351,7 +367,7 @@ void VulkanManager::Present(GlfwManager* window)
 	vkQueueWaitIdle(logicalDevice->GetPresentQueue());
 }
 
-void VulkanManager::BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+Model* VulkanManager::BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
 	Mesh* newMesh = new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), meshName + ".obj", Mesh::MeshFormat::OBJ);
 	meshList.push_back(newMesh);
@@ -368,7 +384,13 @@ void VulkanManager::BasicLoadModel(std::string meshName, std::string textureName
 	testModel->textureName = textureName;
 
 	AddModelToList(testModel);
-	models.push_back(testModel);
+
+	return testModel;
+}
+
+void VulkanManager::MarkModelToBeRemove(Model* model)
+{
+	modelToBeRemove.push_back(model);
 }
 
 void VulkanManager::AddModelToList(Model* model)
@@ -393,10 +415,14 @@ void VulkanManager::AddModelToList(Model* model)
 
 void VulkanManager::RemoveModelFromList(Model* model)
 {
-	auto it = std::find(modelList[model->graphicPipeline][model->mesh].begin(), modelList[model->graphicPipeline][model->mesh].end(), std::unique_ptr<Model>(model));
-
-	if (it != modelList[model->graphicPipeline][model->mesh].end())
-		modelList[model->graphicPipeline][model->mesh].erase(it);
+	for (size_t i = 0; i < modelList[model->graphicPipeline][model->mesh].size(); i++)
+	{
+		if (modelList[model->graphicPipeline][model->mesh][i].get() == model)
+		{
+			modelList[model->graphicPipeline][model->mesh].erase(modelList[model->graphicPipeline][model->mesh].begin() + i);
+			break;
+		}
+	}
 
 	if (modelList[model->graphicPipeline][model->mesh].size() <= 0)
 		modelList[model->graphicPipeline].erase(model->mesh);
@@ -423,6 +449,11 @@ ImguiStuff* VulkanManager::GetImguiStuff() const
 void VulkanManager::WaitForIdle()
 {
 	vkDeviceWaitIdle(logicalDevice->GetVKDevice());
+}
+
+VulkanManager* VulkanManager::GetInstance()
+{
+	return instance;
 }
 
 void VulkanManager::CreateCommandBuffer()

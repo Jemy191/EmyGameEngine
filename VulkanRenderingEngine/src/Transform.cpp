@@ -7,9 +7,9 @@ Transform::Transform()
 
 Transform::Transform(nlohmann::json transform)
 {
-	glm::vec3 position(transform["position"]["x"], transform["position"]["y"], transform["position"]["z"]);
-	glm::vec3 rotation(transform["rotation"]["x"], transform["rotation"]["y"], transform["rotation"]["z"]);
-	glm::vec3 scale(transform["scale"]["x"], transform["scale"]["y"], transform["scale"]["z"]);
+	position = glm::vec3(transform["position"]["x"], transform["position"]["y"], transform["position"]["z"]);
+	rotation = glm::vec3(transform["rotation"]["x"], transform["rotation"]["y"], transform["rotation"]["z"]);
+	scale = glm::vec3(transform["scale"]["x"], transform["scale"]["y"], transform["scale"]["z"]);
 }
 
 Transform::~Transform()

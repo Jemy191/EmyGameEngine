@@ -4,6 +4,8 @@
 #include <iomanip>
 #include <algorithm>
 #include "Log.h"
+#include "ImguiStuff.h"
+#include "SceneModel.h"
 
 Scene* Scene::currentScene = nullptr;
 uint64_t Scene::IDCounter = 0;
@@ -11,8 +13,8 @@ uint64_t Scene::IDCounter = 0;
 const std::string Scene::PATH = "Assets/Scenes/";
 
 Scene::Scene(std::string name)
+	: name(name)
 {
-	this->name = name;
 	currentScene = this;
 	Load();
 }
@@ -40,6 +42,11 @@ void Scene::AddToRootObject(SceneObject* sceneObject)
 	sceneObjectAtRoot.push_back(sceneObject);
 }
 
+void Scene::MarkToRemove(SceneObject* sceneObject)
+{
+	sceneObjectsToRemove.push_back(sceneObject);
+}
+
 void Scene::Remove(SceneObject* sceneObject)
 {
 	if (sceneObject == nullptr)
@@ -52,7 +59,6 @@ void Scene::Remove(SceneObject* sceneObject)
 		if ((*it) == sceneObject)
 		{
 			sceneObjectAtRoot.erase(it);
-			Logger::Log("Scene object remove from scene.");
 			break;
 		}
 	}
@@ -108,6 +114,55 @@ void Scene::Save()
 	output << std::setw(4) << outScene;
 }
 
+void Scene::GUI()
+{
+	ImGui::PushID(this);
+	if (ImGui::Button("Add Scene Object"))
+		Add(new SceneObject());
+	ImGui::SameLine();
+	if (ImGui::Button("Add Scene Model"))
+		Add(new SceneModel());
+
+	if (ImGui::Button("Save Scene"))
+		Save();
+
+	for (size_t i = 0; i < GetRootSceneObjectSize(); i++)
+	{
+		SceneObject* sceneObject = GetRootSceneObject(i);
+
+		if (ImGui::TreeNode((sceneObject->name + "|" + sceneObject->GetType() + "###" + std::to_string(sceneObject->GetID())).c_str()))
+		{
+			sceneObject->GUI();
+
+			ImGui::TreePop();
+		}
+	}
+
+	ImGui::PopID();
+}
+
+void Scene::Update()
+{
+	ClearSceneObjectToRemove();
+
+	for (size_t i = 0; i < GetRootSceneObjectSize(); i++)
+	{
+		GetRootSceneObject(i)->Update();
+	}
+}
+
+void Scene::ClearSceneObjectToRemove()
+{
+	if (sceneObjectsToRemove.size() == 0)
+		return;
+
+	for (size_t i = 0; i < sceneObjectsToRemove.size(); i++)
+	{
+		Remove(sceneObjectsToRemove[i]);
+	}
+	sceneObjectsToRemove.clear();
+}
+
 void Scene::Load()
 {
 	using json = nlohmann::json;
@@ -116,7 +171,7 @@ void Scene::Load()
 	
 	if (input.fail())
 	{
-		Logger::Log("Unable to open " + name + ".json scene file");
+		Logger::Log(LogSeverity::ERROR, "Unable to open " + name + ".json scene file");
 		return;
 	}
 
@@ -127,6 +182,6 @@ void Scene::Load()
 
 	for (auto sceneObjectData : scene["Scene"]["SceneObject"])
 	{
-		Add(new SceneObject(sceneObjectData));
+		Add(SceneObject::LoadByType(sceneObjectData));
 	}
 }

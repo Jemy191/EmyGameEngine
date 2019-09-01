@@ -31,6 +31,12 @@
     <Filter Include="Fichiers sources\Scene">
       <UniqueIdentifier>{92d465f7-598c-4371-af29-a8f7ef32bedc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\Scene\SceneObject">
+      <UniqueIdentifier>{cebc6b7e-8437-4d98-9b3b-52f298dc0bdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Scene\SceneObject">
+      <UniqueIdentifier>{05b59db4-2b1e-4d59-ae98-99b1760815b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Timer.h">
@@ -129,6 +135,9 @@
     <ClInclude Include="src\ImguiStuff.h">
       <Filter>Fichiers d%27en-tête\Imgui</Filter>
     </ClInclude>
+    <ClInclude Include="src\SceneModel.h">
+      <Filter>Fichiers d%27en-tête\Scene\SceneObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Timer.cpp">
@@ -220,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="src\ImguiStuff.cpp">
       <Filter>Fichiers sources\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneModel.cpp">
+      <Filter>Fichiers sources\Scene\SceneObject</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

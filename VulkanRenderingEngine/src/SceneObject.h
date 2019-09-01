@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <optional>
 #include <json.hpp>
+#include "Log.h"
 
 class SceneObject
 {
@@ -18,19 +19,26 @@ public:
 	std::unordered_map<uint64_t, SceneObjectReference> childs;
 
 	SceneObject();
-	SceneObject(nlohmann::json sceneObject);
-	~SceneObject();
+	virtual ~SceneObject();
 
 	void SetParent(SceneObject* newParent);
 	void RemoveChild(SceneObject* newParent);
 	void AddChilds(SceneObject* newChild);
 
 	uint64_t GetID() const;
+	virtual std::string GetType();
 
 	virtual nlohmann::json Save();
+	virtual void Load(nlohmann::json sceneObject);
+
+	virtual void GUI();
+	virtual void Update();
+
+	static SceneObject* LoadByType(nlohmann::json data);
 
 private:
-	virtual void Load(nlohmann::json sceneObject);
+
+	void MarkToRemove(SceneObject* sceneObject);
 
 private:
 

@@ -14,12 +14,12 @@
 #include "Imgui/imgui_internal.h"
 #include <filesystem>
 
-float camSpeed = 20;
+float camSpeed = 5;
 float lookSpeed = 0.5f;
 
 char meshToLoadInput[64] = "";
 char textureToLoadInput[64] = "";
-std::string sceneToLoad = "TestRealScene";
+std::string sceneToLoad = "NewScene";
 
 bool demoWindowOpen = false;
 bool settingWindowOpen = false;
@@ -69,29 +69,6 @@ void GUI(VulkanManager* vulkanManager)
 				//ImGui::SliderFloat("Light spec", &vulkanManager->lightSetting.y, 0.1f, 10);
 				ImGui::ColorEdit3("Light color", &vulkanManager->lightColor.x);
 			}
-
-			if (ImGui::CollapsingHeader("Import model"))
-			{
-				ImGui::InputText("MeshToLoad", meshToLoadInput, IM_ARRAYSIZE(meshToLoadInput));
-				ImGui::InputText("TextureToLoad", textureToLoadInput, IM_ARRAYSIZE(textureToLoadInput));
-				if (ImGui::Button("Load model"))
-					vulkanManager->BasicLoadModel(std::string(meshToLoadInput), std::string(textureToLoadInput), glm::vec3(0), glm::vec3(0), glm::vec3(1));
-			}
-
-			if (ImGui::CollapsingHeader("Model setting"))
-			{
-				for (size_t i = 0; i < vulkanManager->models.size(); i++)
-				{
-					string label = "Model: " + vulkanManager->models[i]->meshName + " " + vulkanManager->models[i]->textureName + " " + std::to_string(i);
-					if (ImGui::TreeNode(label.c_str()))
-					{
-						ImGui::DragFloat3("Position", &vulkanManager->models[i]->position.x, 0.1f, -20, 20);
-						ImGui::DragFloat3("rotation", &vulkanManager->models[i]->rotation.x, 0.1f, 0, 360);
-						ImGui::DragFloat3("scale", &vulkanManager->models[i]->scale.x, 0.1f, -5, 5);
-						ImGui::TreePop();
-					}
-				}
-			}
 		}
 		ImGui::End();
 	}
@@ -103,19 +80,14 @@ void GUI(VulkanManager* vulkanManager)
 		{
 			ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
 
-			ImGui::InputText("##LoadScene", &sceneToLoad);
-			ImGui::SameLine();
-			if (std::filesystem::exists("Assets/Scenes/" + sceneToLoad + ".json"))
+			ImGui::InputTextWithHint("##LoadScene", "Scene to create/load", &sceneToLoad);
+
+			if (sceneToLoad != "")
 			{
-				if (ImGui::Button("Load"))
-				{
-					new Scene(sceneToLoad);
-					sceneToLoad = "";
-				}
-			}
-			else
-			{
-				if (ImGui::Button("Create"))
+				std::string buttonText = std::filesystem::exists("Assets/Scenes/" + sceneToLoad + ".json") ? "Load" : "Create";
+				ImGui::SameLine();
+
+				if (ImGui::Button(buttonText.c_str()))
 				{
 					new Scene(sceneToLoad);
 					sceneToLoad = "";
@@ -124,37 +96,7 @@ void GUI(VulkanManager* vulkanManager)
 
 			Scene* scene = Scene::GetCurrentScene();
 			if (scene != nullptr)
-			{
-				if (ImGui::Button("Add Scene Object"))
-				{
-					scene->Add(new SceneObject());
-				}
-
-				if (ImGui::Button("Save Scene"))
-					scene->Save();
-
-				for (size_t i = 0; i < scene->GetRootSceneObjectSize(); i++)
-				{
-					SceneObject* sceneObject = scene->GetRootSceneObject(i);
-
-					if (ImGui::TreeNode((sceneObject->name + "###" + std::to_string(sceneObject->GetID())).c_str()))
-					{
-						ImGui::Text(std::to_string(sceneObject->GetID()).c_str());
-						ImGui::SameLine();
-						if (ImGui::Button("Delete"))
-						{
-							scene->Remove(sceneObject);
-							ImGui::TreePop();// temporary
-							continue;
-						}
-						ImGui::InputText("Name", &sceneObject->name);
-
-						sceneObject->transform.GUI();
-
-						ImGui::TreePop();
-					}
-				}
-			}
+				scene->GUI();
 		}
 		ImGui::End();
 	}
@@ -182,23 +124,6 @@ int WinMain()
 	Logger::Open();
 	GlfwManager glfwManager = GlfwManager(1600, 900, "TestGame");
 	VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
-
-	//Load scene
-	using json = nlohmann::json;
-
-	std::ifstream input("Assets/Scenes/Test.json");
-
-	json scene;
-	input >> scene;
-
-	for (auto model : scene["scene"]["models"])
-	{
-		glm::vec3 position(model["position"]["x"], model["position"]["y"], model["position"]["z"]);
-		glm::vec3 rotation(model["rotation"]["x"], model["rotation"]["y"], model["rotation"]["z"]);
-		glm::vec3 scale(model["scale"]["x"], model["scale"]["y"], model["scale"]["z"]);
-
-		vulkanManager.BasicLoadModel(model["mesh"], model["texture"], position, rotation, scale);
-	}
 
 	try
 	{
@@ -262,6 +187,9 @@ int WinMain()
 
 			vulkanManager.GetImguiStuff()->StartFrame();
 
+			if (Scene::GetCurrentScene() != nullptr)
+				Scene::GetCurrentScene()->Update();
+
 			GUI(&vulkanManager);
 
 			vulkanManager.GetImguiStuff()->EndFrame();
@@ -277,34 +205,6 @@ int WinMain()
 		Logger::Log(LogSeverity::ERROR, e.what());
 		return 1;
 	}
-
-	// Save scene
-	json outScene;
-
-	for (size_t i = 0; i < vulkanManager.models.size(); i++)
-	{
-		json model;
-		model["position"]["x"] = vulkanManager.models[i]->position.x;
-		model["position"]["y"] = vulkanManager.models[i]->position.y;
-		model["position"]["z"] = vulkanManager.models[i]->position.z;
-
-		model["rotation"]["x"] = vulkanManager.models[i]->rotation.x;
-		model["rotation"]["y"] = vulkanManager.models[i]->rotation.y;
-		model["rotation"]["z"] = vulkanManager.models[i]->rotation.z;
-
-		model["scale"]["x"] = vulkanManager.models[i]->scale.x;
-		model["scale"]["y"] = vulkanManager.models[i]->scale.y;
-		model["scale"]["z"] = vulkanManager.models[i]->scale.z;
-
-		model["mesh"] = vulkanManager.models[i]->meshName;
-		model["texture"] = vulkanManager.models[i]->textureName;
-
-		outScene["scene"]["models"].push_back(model);
-	}
-
-	// save scene
-	std::ofstream output("Assets/Scenes/Test.json");
-	output << std::setw(4) << outScene;
 
 	return 0;
 }

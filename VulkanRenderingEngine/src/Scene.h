@@ -17,13 +17,15 @@ private:
 
 	std::string name;
 
+	std::vector<SceneObject*> sceneObjectsToRemove;
+
 public:
 	Scene(std::string name);
 	~Scene();
 
 	void Add(SceneObject* sceneObject);
 	void AddToRootObject(SceneObject* sceneObject);//TODO Change this
-	void Remove(SceneObject* sceneObject);
+	void MarkToRemove(SceneObject* sceneObject);
 
 	static Scene* GetCurrentScene();
 	SceneObject* GetSceneObjectByID(uint64_t ID);
@@ -35,6 +37,11 @@ public:
 
 	void Save();
 
+	void GUI();
+	void Update();
+
 private:
+	void Remove(SceneObject* sceneObject);
+	void ClearSceneObjectToRemove();
 	void Load();
 };
