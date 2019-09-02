@@ -18,7 +18,7 @@ private:
 	VkSampler textureSampler;
 
 public:
-	Texture(VkCommandPool globalCommandPool, std::string name, bool createMipMap = true);
+	Texture(std::string name, bool createMipMap = true);
 	~Texture();
 
 	bool GetHasAlpha() const;

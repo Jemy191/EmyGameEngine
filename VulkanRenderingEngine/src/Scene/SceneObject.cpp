@@ -3,7 +3,6 @@
 #include "Scene.h"
 
 bool SceneObject::isBeingCreated = false;
-bool SceneObject::hasBeenInit = false;
 
 void SceneObject::Init()
 {

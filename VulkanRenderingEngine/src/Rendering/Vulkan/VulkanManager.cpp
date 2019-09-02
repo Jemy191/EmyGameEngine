@@ -77,9 +77,9 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 
 
 	Logger::Log("Creating test skybox");
-	skyboxTexture = std::unique_ptr<Texture>(new Texture(globalCommandPool, "Debug.jpg"));
-	debugNormalTexture = std::unique_ptr<Texture>(new Texture(globalCommandPool, "DebugNormalMap.jpg"));
-	skyboxMesh = std::unique_ptr<Mesh>(new Mesh(globalCommandPool, "SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
+	skyboxTexture = std::unique_ptr<Texture>(new Texture("Debug.jpg"));
+	debugNormalTexture = std::unique_ptr<Texture>(new Texture("DebugNormalMap.jpg"));
+	skyboxMesh = std::unique_ptr<Mesh>(new Mesh("SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
 	Model* testModel = new Model(skyboxMesh.get(), skyboxTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
 	testModel->position = glm::vec3(0);
 	AddModelToList(testModel);
@@ -345,10 +345,10 @@ void VulkanManager::Present(GlfwManager* window)
 
 Model* VulkanManager::BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
-	Mesh* newMesh = new Mesh(globalCommandPool, meshName + ".obj", Mesh::MeshFormat::OBJ);
+	Mesh* newMesh = new Mesh(meshName + ".obj", Mesh::MeshFormat::OBJ);
 	meshList.push_back(newMesh);
 
-	Texture* newTexture = new Texture(globalCommandPool, textureName);
+	Texture* newTexture = new Texture(textureName);
 	textureList.push_back(newTexture);
 
 	Model* testModel = new Model(newMesh, newTexture, debugNormalTexture.get(), basicGraphicPipeline.get());
@@ -435,6 +435,11 @@ VulkanSwapChain* VulkanManager::GetSwapChain() const
 VulkanRenderPass* VulkanManager::GetRenderPass() const
 {
 	return renderPass.get();
+}
+
+VkCommandPool VulkanManager::GetGlobalCommandPool() const
+{
+	return globalCommandPool;
 }
 
 ImguiStuff* VulkanManager::GetImguiStuff() const

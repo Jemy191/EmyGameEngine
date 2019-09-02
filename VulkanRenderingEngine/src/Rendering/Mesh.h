@@ -27,7 +27,7 @@ private:
 	VkDeviceMemory indexBufferMemory;
 
 public:
-	Mesh(VkCommandPool globalCommandPool, std::string meshName, MeshFormat meshFormat, bool isGltfBinary = true);
+	Mesh(std::string meshName, MeshFormat meshFormat, bool isGltfBinary = true);
 	~Mesh();
 
 	void CmdBind(VkCommandBuffer commandBuffer);

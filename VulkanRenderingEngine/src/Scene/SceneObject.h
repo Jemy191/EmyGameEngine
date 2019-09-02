@@ -12,7 +12,7 @@ class SceneObject
 {
 private:
 	static bool isBeingCreated;
-	static bool hasBeenInit;
+	bool hasBeenInit = false;
 
 	uint64_t ID = 0;
 

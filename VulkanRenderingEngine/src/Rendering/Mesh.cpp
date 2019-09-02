@@ -15,11 +15,12 @@
 
 const std::string Mesh::PATH = "Assets/Meshs/";
 
-Mesh::Mesh(VkCommandPool globalCommandPool, std::string meshName, MeshFormat meshFormat, bool isGltfBinary)
+Mesh::Mesh(std::string meshName, MeshFormat meshFormat, bool isGltfBinary)
 {
 	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
 	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
 	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
+	VkCommandPool globalCommandPool = VulkanManager::GetInstance()->GetGlobalCommandPool();
 
 	// load mesh
 	std::string meshPath = PATH + meshName;

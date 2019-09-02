@@ -101,6 +101,7 @@ public:
 	VulkanLogicalDevice* GetLogicalDevice() const;
 	VulkanSwapChain* GetSwapChain() const;
 	VulkanRenderPass* GetRenderPass() const;
+	VkCommandPool GetGlobalCommandPool() const;
 
 	ImguiStuff* GetImguiStuff() const;
 	void WaitForIdle();

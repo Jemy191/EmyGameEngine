@@ -13,11 +13,12 @@
 
 const std::string Texture::PATH = "Assets/Textures/";
 
-Texture::Texture(VkCommandPool globalCommandPool, std::string name, bool createMipMap)
+Texture::Texture(std::string name, bool createMipMap)
 {
 	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
 	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
 	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
+	VkCommandPool globalCommandPool = VulkanManager::GetInstance()->GetGlobalCommandPool();
 
 	std::string filename = PATH + name;
 
