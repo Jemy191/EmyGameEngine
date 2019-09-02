@@ -21,10 +21,8 @@ private:
 	VkDeviceMemory depthImageMemory = nullptr;
 	VkImageView depthImageView = nullptr;
 
-	VkDevice device = nullptr;
-
 public:
-	VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSampleCountFlagBits msaaSample, VkCommandPool commandPool, VkQueue graphicQueue, VkRenderPass renderPass);
+	VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommandPool);
 	~VulkanSwapChain();
 
 	VkSwapchainKHR GetVkSwapchainKHR() const;

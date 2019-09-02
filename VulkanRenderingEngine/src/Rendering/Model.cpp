@@ -1,10 +1,11 @@
 #include "Rendering/Model.h"
 #include "Helper/Log.h"
+#include "Rendering/Vulkan/VulkanManager.h"
 
-Model::Model(VkDevice device, VkPhysicalDevice physicalDevice, size_t swapchainImagesSize, Mesh* mesh, Texture* texture, Texture* normalTexture, VulkanGraphicPipeline* graphicPipeline)
-	: device(device), physicalDevice(physicalDevice), mesh(mesh), texture(texture), normalTexture(normalTexture), graphicPipeline(graphicPipeline)
+Model::Model(Mesh* mesh, Texture* texture, Texture* normalTexture, VulkanGraphicPipeline* graphicPipeline)
+	: mesh(mesh), texture(texture), normalTexture(normalTexture), graphicPipeline(graphicPipeline)
 {
-	Create(swapchainImagesSize);
+	Create();
 }
 
 Model::~Model()
@@ -21,20 +22,26 @@ void Model::Draw(VkCommandBuffer commandBuffer, int i)
 
 void Model::UpdateUniformBuffer(uint32_t currentImage, VulkanHelper::UniformBufferObject* ubo)
 {
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+
 	void* data;
 	vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(*ubo), 0, &data);
 	memcpy(data, ubo, sizeof(*ubo));
 	vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
 }
 
-void Model::Recreate(size_t swapchainImagesSize)
+void Model::Recreate()
 {
 	Cleanup();
-	Create(swapchainImagesSize);
+	Create();
 }
 
-void Model::Create(size_t swapchainImagesSize)
+void Model::Create()
 {
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	size_t swapchainImagesSize = VulkanManager::GetInstance()->GetSwapChain()->GetVkImages().size();
+
 	// Uniform buffer
 	VkDeviceSize bufferSize = sizeof(VulkanHelper::UniformBufferObject);
 
@@ -52,6 +59,7 @@ void Model::Create(size_t swapchainImagesSize)
 
 void Model::Cleanup()
 {
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
 	for (size_t i = 0; i < uniformBuffers.size(); i++)
 	{
 		vkDestroyBuffer(device, uniformBuffers[i], nullptr);

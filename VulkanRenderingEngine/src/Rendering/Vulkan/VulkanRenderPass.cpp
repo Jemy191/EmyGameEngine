@@ -4,12 +4,16 @@
 
 #include "Helper/Log.h"
 #include <array>
+#include "VulkanManager.h"
 
-VulkanRenderPass::VulkanRenderPass(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSampleCountFlagBits msaaSamples)
+VulkanRenderPass::VulkanRenderPass()
 {
-	this->device = device;
+	Logger::Log("Creating renderPass");
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	VkSampleCountFlagBits msaaSamples = VulkanManager::GetInstance()->GetPhysicalDevice()->GetMsaaSample();
 
-	VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport(physicalDevice, surface);
+	VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport(physicalDevice);
 
 	VkSurfaceFormatKHR surfaceFormat = VulkanHelper::ChooseSwapSurfaceFormat(swapChainSupport.formats);
 
@@ -88,7 +92,7 @@ VulkanRenderPass::VulkanRenderPass(VkDevice device, VkPhysicalDevice physicalDev
 
 VulkanRenderPass::~VulkanRenderPass()
 {
-	vkDestroyRenderPass(device, renderPass, nullptr);
+	vkDestroyRenderPass(VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice(), renderPass, nullptr);
 
 	Logger::Log("Render pass destroyed");
 }

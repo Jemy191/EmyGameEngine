@@ -9,10 +9,8 @@ class VulkanRenderPass
 private:
 	VkRenderPass renderPass = nullptr;
 
-	VkDevice device = nullptr;
-
 public:
-	VulkanRenderPass(VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSampleCountFlagBits msaaSamples);
+	VulkanRenderPass();
 	~VulkanRenderPass();
 
 	VkRenderPass GetVkRenderPass() const;

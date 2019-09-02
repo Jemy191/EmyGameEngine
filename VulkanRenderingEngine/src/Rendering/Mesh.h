@@ -18,8 +18,6 @@ public:
 private:
 	static const std::string PATH;
 
-	VkDevice device;
-
 	std::vector<VulkanHelper::Vertex> vertices;
 	std::vector<uint32_t> indices;
 
@@ -29,7 +27,7 @@ private:
 	VkDeviceMemory indexBufferMemory;
 
 public:
-	Mesh(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicQueue, std::string meshName, MeshFormat meshFormat, bool isGltfBinary = true);
+	Mesh(VkCommandPool globalCommandPool, std::string meshName, MeshFormat meshFormat, bool isGltfBinary = true);
 	~Mesh();
 
 	void CmdBind(VkCommandBuffer commandBuffer);

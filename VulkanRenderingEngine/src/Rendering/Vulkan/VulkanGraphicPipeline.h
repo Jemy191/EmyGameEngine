@@ -17,13 +17,11 @@ public:
 private:
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
 
-	VkDevice device = nullptr;
-
 	VkPipelineLayout pipelineLayout = nullptr;
 	VkPipeline graphicsPipeline = nullptr;
 
 public:
-	void Create(VkDevice device, VkExtent2D swapChainExtent, VkRenderPass renderPass, VkSampleCountFlagBits msaaSamples, VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL);
+	void Create(VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL);
 	~VulkanGraphicPipeline();
 
 	/// <summary>

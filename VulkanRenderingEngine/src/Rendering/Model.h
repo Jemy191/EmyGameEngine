@@ -24,22 +24,19 @@ public:
 	std::string textureName = "Debug.jpg";
 
 private:
-	VkDevice device;
-	VkPhysicalDevice physicalDevice;
-
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
 	std::unique_ptr <VulkanDescriptor> descriptor;
 
 public:
-	Model(VkDevice device, VkPhysicalDevice physicalDevice, size_t swapchainImagesSize, Mesh* mesh, Texture* texture, Texture* normalTexture, VulkanGraphicPipeline* graphicPipeline);
+	Model(Mesh* mesh, Texture* texture, Texture* normalTexture, VulkanGraphicPipeline* graphicPipeline);
 	~Model();
 
 	void Draw(VkCommandBuffer commandBuffer, int i);
 	void UpdateUniformBuffer(uint32_t currentImage, VulkanHelper::UniformBufferObject* ubo);
-	void Recreate(size_t swapchainImagesSize);
+	void Recreate();
 
 private:
-	void Create(size_t swapchainImagesSize);
+	void Create();
 	void Cleanup();
 };

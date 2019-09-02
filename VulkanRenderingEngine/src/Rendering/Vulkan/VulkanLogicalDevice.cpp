@@ -3,14 +3,18 @@
 #include "Rendering/Vulkan/VulkanHelper.h"
 #include "VulkanInstance.h"
 #include "VulkanPhysicalDevice.h"
+#include "VulkanManager.h"
 
 #include <vector>
 #include <set>
 #include "Helper/Log.h"
 
-VulkanLogicalDevice::VulkanLogicalDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
+VulkanLogicalDevice::VulkanLogicalDevice()
 {
-	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies(physicalDevice, surface);
+	Logger::Log("Creating logicalDevice");
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+
+	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies(physicalDevice);
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};

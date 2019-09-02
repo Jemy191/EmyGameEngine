@@ -59,7 +59,7 @@ private:
 	std::map<VulkanGraphicPipeline*, std::map<Mesh*, std::vector<std::unique_ptr<Model>>>> modelList;
 
 	std::unique_ptr<Texture> checkerTexture;
-	std::unique_ptr<Texture> debugTexture;
+	std::unique_ptr<Texture> skyboxTexture;
 	std::unique_ptr<Texture> debugNormalTexture;
 	std::unique_ptr<Texture> testNormalTexture;
 	std::unique_ptr<Mesh> skyboxMesh;
@@ -73,7 +73,7 @@ private:
 	std::vector <VkCommandPool> drawCommandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
-	VkCommandPool commandPool;
+	VkCommandPool globalCommandPool;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -86,7 +86,7 @@ public:
 	VulkanManager(GLFWwindow* window, VkSampleCountFlagBits msaaSamples);
 	~VulkanManager();
 
-	void RecreateSwapChain();
+	//void RecreateSwapChain();
 
 	void Present(GlfwManager* window);
 
@@ -97,6 +97,11 @@ public:
 
 	VulkanInstance* GetVulkanInstance() const;
 	VkSurfaceKHR GetVkSurfaceKHR() const;
+	VulkanPhysicalDevice* GetPhysicalDevice() const;
+	VulkanLogicalDevice* GetLogicalDevice() const;
+	VulkanSwapChain* GetSwapChain() const;
+	VulkanRenderPass* GetRenderPass() const;
+
 	ImguiStuff* GetImguiStuff() const;
 	void WaitForIdle();
 

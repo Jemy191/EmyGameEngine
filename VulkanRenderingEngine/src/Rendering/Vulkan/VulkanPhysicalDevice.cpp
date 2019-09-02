@@ -4,15 +4,17 @@
 #include <string>
 #include "Helper/Log.h"
 #include "Rendering/Vulkan/VulkanHelper.h"
+#include "VulkanManager.h"
 
 const std::vector<const char*> VulkanPhysicalDevice::DEVICE_EXTENSIONS =
 {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-VulkanPhysicalDevice::VulkanPhysicalDevice(VkInstance instance, VkSurfaceKHR surface, VkSampleCountFlagBits msaaSamples)
+VulkanPhysicalDevice::VulkanPhysicalDevice(VkSampleCountFlagBits msaaSamples)
 {
-	this->surface = surface;
+	Logger::Log("Creating physicalDevice");
+	VkInstance instance = VulkanManager::GetInstance()->GetVulkanInstance()->GetInstance();
 
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -84,14 +86,14 @@ VkSampleCountFlagBits VulkanPhysicalDevice::GetMsaaSample() const
 
 bool VulkanPhysicalDevice::IsDeviceSuitable(VkPhysicalDevice device)
 {
-	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies(device, surface);
+	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies(device);
 
 	bool extensionsSupported = CheckDeviceExtensionSupport(device);
 
 	bool swapChainAdequate = false;
 	if (extensionsSupported)
 	{
-		VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport(device, surface);
+		VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport(device);
 		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 

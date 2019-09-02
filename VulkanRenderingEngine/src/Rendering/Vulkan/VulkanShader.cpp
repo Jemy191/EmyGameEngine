@@ -3,12 +3,13 @@
 #include "Helper/Log.h"
 #include <fstream>
 #include <memory>
+#include "VulkanManager.h"
 
 const std::string VulkanShader::PATH = "Assets/Shaders/";
 
-VulkanShader::VulkanShader(VkDevice device, std::string name, VkShaderStageFlagBits stage, const char* entryPointName)
+VulkanShader::VulkanShader(std::string name, VkShaderStageFlagBits stage, const char* entryPointName)
 {
-	this->device = device;
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
 
 	auto code = LoadShader(name + ".spv");
 
@@ -33,7 +34,7 @@ VulkanShader::VulkanShader(VkDevice device, std::string name, VkShaderStageFlagB
 VulkanShader::~VulkanShader()
 {
 	//TODO: Move this somewhere else
-	vkDestroyShaderModule(device, shaderModule, nullptr);
+	vkDestroyShaderModule(VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice(), shaderModule, nullptr);
 
 	Logger::Log("Shader destroyed");
 }

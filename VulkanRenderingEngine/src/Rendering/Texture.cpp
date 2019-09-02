@@ -7,14 +7,17 @@
 #include <cmath>
 #include <algorithm>
 #include "Helper/Log.h"
+#include "Rendering/Vulkan/VulkanManager.h"
 
 #include "Rendering/Vulkan/VulkanHelper.h"
 
 const std::string Texture::PATH = "Assets/Textures/";
 
-Texture::Texture(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicQueue, std::string name, bool createMipMap)
+Texture::Texture(VkCommandPool globalCommandPool, std::string name, bool createMipMap)
 {
-	this->device = device;
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
 
 	std::string filename = PATH + name;
 
@@ -51,7 +54,7 @@ Texture::Texture(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool
 	VulkanHelper::CreateTextureParameter textureParameter = {};
 	textureParameter.device = device;
 	textureParameter.physicalDevice = physicalDevice;
-	textureParameter.commandPool = commandPool;
+	textureParameter.globalCommandPool = globalCommandPool;
 	textureParameter.extent = extent;
 	textureParameter.mipLevels = mipLevels;
 	textureParameter.msaaSample = VK_SAMPLE_COUNT_1_BIT;
@@ -66,13 +69,13 @@ Texture::Texture(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool
 
 	VulkanHelper::CreateTexture(textureParameter, textureImage, textureImageView, textureImageMemory);
 
-	VulkanHelper::CopyBufferToImage(device, commandPool, graphicQueue, stagingBuffer, textureImage, extent);
+	VulkanHelper::CopyBufferToImage(device, globalCommandPool, graphicQueue, stagingBuffer, textureImage, extent);
 	//transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
 
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
 
-	VulkanHelper::GenerateMipmaps(device, physicalDevice, commandPool, graphicQueue, textureImage, VK_FORMAT_R8G8B8A8_UNORM, extent, mipLevels);
+	VulkanHelper::GenerateMipmaps(device, physicalDevice, globalCommandPool, graphicQueue, textureImage, VK_FORMAT_R8G8B8A8_UNORM, extent, mipLevels);
 
 	VkSamplerCreateInfo samplerInfo = {};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -100,6 +103,8 @@ Texture::Texture(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool
 
 Texture::~Texture()
 {
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+
 	vkDestroyImage(device, textureImage, nullptr);
 	vkFreeMemory(device, textureImageMemory, nullptr);
 	vkDestroyImageView(device, textureImageView, nullptr);

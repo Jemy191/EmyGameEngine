@@ -1,18 +1,21 @@
 #include "Rendering/Vulkan/VulkanHelper.h"
 
 #include "Helper/Log.h"
+#include "VulkanManager.h"
 
 namespace VulkanHelper
 {
-	QueueFamilyIndices VulkanHelper::FindQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
+	QueueFamilyIndices VulkanHelper::FindQueueFamilies(VkPhysicalDevice physicalDevice)
 	{
+		VkSurfaceKHR surface = VulkanManager::GetInstance()->GetVkSurfaceKHR();
+
 		QueueFamilyIndices indices;
 
 		uint32_t queueFamilyCount = 0;
-		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
 
 		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
 
 		int i = 0;
 		for (const auto& queueFamily : queueFamilies)
@@ -23,7 +26,7 @@ namespace VulkanHelper
 			}
 
 			VkBool32 presentSupport = false;
-			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+			vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &presentSupport);
 
 			if (queueFamily.queueCount > 0 && presentSupport)
 			{
@@ -41,8 +44,10 @@ namespace VulkanHelper
 		return indices;
 	}
 
-	SwapChainSupportDetails VulkanHelper::QuerySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
+	SwapChainSupportDetails VulkanHelper::QuerySwapChainSupport(VkPhysicalDevice device)
 	{
+		VkSurfaceKHR surface = VulkanManager::GetInstance()->GetVkSurfaceKHR();
+
 		SwapChainSupportDetails details;
 
 		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
@@ -159,12 +164,12 @@ namespace VulkanHelper
 	{
 		VulkanHelper::CreateImage(parameter.device, parameter.physicalDevice, parameter.extent.width, parameter.extent.height, parameter.mipLevels, parameter.msaaSample, parameter.imageFormat, parameter.tiling, parameter.usage, parameter.properties, image, imageMemory);
 		imageView = VulkanHelper::CreateImageView(parameter.device, image, parameter.imageFormat, parameter.aspectFlags, parameter.mipLevels);
-		VulkanHelper::TransitionImageLayout(parameter.device, parameter.graphicsQueue, parameter.commandPool, image, parameter.imageFormat, parameter.oldLayout, parameter.newLayout, parameter.mipLevels);
+		VulkanHelper::TransitionImageLayout(parameter.device, parameter.graphicsQueue, parameter.globalCommandPool, image, parameter.imageFormat, parameter.oldLayout, parameter.newLayout, parameter.mipLevels);
 	}
 
-	void VulkanHelper::TransitionImageLayout(VkDevice device, VkQueue graphicsQueue, VkCommandPool commandPool, VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels)
+	void VulkanHelper::TransitionImageLayout(VkDevice device, VkQueue graphicsQueue, VkCommandPool globalCommandPool, VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels)
 	{
-		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, commandPool);
+		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, globalCommandPool);
 
 		VkImageMemoryBarrier barrier = {};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -241,7 +246,7 @@ namespace VulkanHelper
 			1, &barrier
 		);
 
-		EndSingleTimeCommands(device, graphicsQueue, commandBuffer, commandPool);
+		EndSingleTimeCommands(device, graphicsQueue, commandBuffer, globalCommandPool);
 	}
 
 	void VulkanHelper::CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -273,9 +278,9 @@ namespace VulkanHelper
 		vkBindBufferMemory(device, buffer, bufferMemory, 0);
 	}
 
-	void VulkanHelper::CopyBufferToImage(VkDevice device, VkCommandPool commandPool, VkQueue graphicQueue, VkBuffer buffer, VkImage image, VkExtent2D extent)
+	void VulkanHelper::CopyBufferToImage(VkDevice device, VkCommandPool globalCommandPool, VkQueue graphicQueue, VkBuffer buffer, VkImage image, VkExtent2D extent)
 	{
-		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, commandPool);
+		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, globalCommandPool);
 
 		VkBufferImageCopy region = {};
 		region.bufferOffset = 0;
@@ -294,10 +299,10 @@ namespace VulkanHelper
 
 		vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
-		EndSingleTimeCommands(device, graphicQueue, commandBuffer, commandPool);
+		EndSingleTimeCommands(device, graphicQueue, commandBuffer, globalCommandPool);
 	}
 
-	void VulkanHelper::GenerateMipmaps(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicQueue, VkImage image, VkFormat imageFormat, VkExtent2D extent, uint32_t mipLevels)
+	void VulkanHelper::GenerateMipmaps(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool globalCommandPool, VkQueue graphicQueue, VkImage image, VkFormat imageFormat, VkExtent2D extent, uint32_t mipLevels)
 	{
 		// Check if image format supports linear blitting
 		VkFormatProperties formatProperties;
@@ -308,7 +313,7 @@ namespace VulkanHelper
 			Logger::Log(LogSeverity::FATAL_ERROR, "texture image format does not support linear blitting!");
 		}
 
-		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, commandPool);
+		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, globalCommandPool);
 
 		VkImageMemoryBarrier barrier = {};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -384,26 +389,26 @@ namespace VulkanHelper
 							 0, nullptr,
 							 1, &barrier);
 
-		EndSingleTimeCommands(device, graphicQueue, commandBuffer, commandPool);
+		EndSingleTimeCommands(device, graphicQueue, commandBuffer, globalCommandPool);
 	}
 
-	void CopyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicQueue, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+	void CopyBuffer(VkDevice device, VkCommandPool globalCommandPool, VkQueue graphicQueue, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 	{
-		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, commandPool);
+		VkCommandBuffer commandBuffer = BeginSingleTimeCommands(device, globalCommandPool);
 
 		VkBufferCopy copyRegion = {};
 		copyRegion.size = size;
 		vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-		EndSingleTimeCommands(device, graphicQueue, commandBuffer, commandPool);
+		EndSingleTimeCommands(device, graphicQueue, commandBuffer, globalCommandPool);
 	}
 
-	VkCommandBuffer VulkanHelper::BeginSingleTimeCommands(VkDevice device, VkCommandPool commandPool)
+	VkCommandBuffer VulkanHelper::BeginSingleTimeCommands(VkDevice device, VkCommandPool globalCommandPool)
 	{
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandPool = commandPool;
+		allocInfo.globalCommandPool = globalCommandPool;
 		allocInfo.commandBufferCount = 1;
 
 		VkCommandBuffer commandBuffer;
@@ -418,7 +423,7 @@ namespace VulkanHelper
 		return commandBuffer;
 	}
 
-	void VulkanHelper::EndSingleTimeCommands(VkDevice device, VkQueue graphicsQueue, VkCommandBuffer commandBuffer, VkCommandPool commandPool)
+	void VulkanHelper::EndSingleTimeCommands(VkDevice device, VkQueue graphicsQueue, VkCommandBuffer commandBuffer, VkCommandPool globalCommandPool)
 	{
 		vkEndCommandBuffer(commandBuffer);
 
@@ -430,7 +435,7 @@ namespace VulkanHelper
 		vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
 		vkQueueWaitIdle(graphicsQueue);
 
-		vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+		vkFreeCommandBuffers(device, globalCommandPool, 1, &commandBuffer);
 	}
 
 	bool VulkanHelper::HasStencilComponent(VkFormat format)

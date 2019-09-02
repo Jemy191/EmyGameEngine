@@ -4,12 +4,20 @@
 
 #include <algorithm>
 #include "Helper/Log.h"
+#include "VulkanManager.h"
 
-VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSampleCountFlagBits msaaSample, VkCommandPool commandPool, VkQueue graphicQueue, VkRenderPass renderPass)
+VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommandPool)
 {
-	this->device = device;
+	Logger::Log("Creating swapChain");
 
-	VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport(physicalDevice, surface);
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	VkSurfaceKHR surface = VulkanManager::GetInstance()->GetVkSurfaceKHR();
+	VkSampleCountFlagBits msaaSample = VulkanManager::GetInstance()->GetPhysicalDevice()->GetMsaaSample();
+	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
+	VkRenderPass renderPass = VulkanManager::GetInstance()->GetRenderPass()->GetVkRenderPass();
+
+	VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport(physicalDevice);
 
 	VkSurfaceFormatKHR surfaceFormat = VulkanHelper::ChooseSwapSurfaceFormat(swapChainSupport.formats);
 	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
@@ -35,7 +43,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysical
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
 
-	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies(physicalDevice, surface);
+	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies(physicalDevice);
 	uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
 	if (indices.graphicsFamily != indices.presentFamily)
@@ -72,7 +80,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysical
 	VulkanHelper::CreateTextureParameter colorTextureParameter = {};
 	colorTextureParameter.device = device;
 	colorTextureParameter.physicalDevice = physicalDevice;
-	colorTextureParameter.commandPool = commandPool;
+	colorTextureParameter.globalCommandPool = globalCommandPool;
 	colorTextureParameter.extent = extent;
 	colorTextureParameter.mipLevels = 1;
 	colorTextureParameter.msaaSample = msaaSample;
@@ -92,7 +100,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysical
 	VulkanHelper::CreateTextureParameter depthTextureParameter = {};
 	depthTextureParameter.device = device;
 	depthTextureParameter.physicalDevice = physicalDevice;
-	depthTextureParameter.commandPool = commandPool;
+	depthTextureParameter.globalCommandPool = globalCommandPool;
 	depthTextureParameter.extent = extent;
 	depthTextureParameter.mipLevels = 1;
 	depthTextureParameter.msaaSample = msaaSample;
@@ -135,6 +143,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkDevice device, VkPhysical
 
 VulkanSwapChain::~VulkanSwapChain()
 {
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
 	vkDestroyImageView(device, colorImageView, nullptr);
 	vkDestroyImage(device, colorImage, nullptr);
 	vkFreeMemory(device, colorImageMemory, nullptr);

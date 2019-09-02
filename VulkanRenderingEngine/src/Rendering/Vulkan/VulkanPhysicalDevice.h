@@ -12,12 +12,11 @@ public:
 
 private:
 	VkPhysicalDevice physicalDevice = nullptr;
-	VkSurfaceKHR surface = nullptr;
 
 	VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 
 public:
-	VulkanPhysicalDevice(VkInstance instance, VkSurfaceKHR surface, VkSampleCountFlagBits msaaSamples);
+	VulkanPhysicalDevice(VkSampleCountFlagBits msaaSamples);
 
 	VkSampleCountFlagBits GetMsaaSample() const;
 	VkSampleCountFlagBits GetMaxUsableSampleCount() const;

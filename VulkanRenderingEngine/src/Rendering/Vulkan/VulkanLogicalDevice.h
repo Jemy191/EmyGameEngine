@@ -10,7 +10,7 @@ private:
 	VkQueue presentQueue = nullptr;
 
 public:
-	VulkanLogicalDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface);
+	VulkanLogicalDevice();
 	~VulkanLogicalDevice();
 
 	VkDevice GetVKDevice() const;

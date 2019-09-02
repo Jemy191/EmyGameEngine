@@ -32,7 +32,7 @@ namespace VulkanHelper
 		VkDevice device;
 		VkPhysicalDevice physicalDevice;
 		VkQueue graphicsQueue;
-		VkCommandPool commandPool;
+		VkCommandPool globalCommandPool;
 
 		VkExtent2D extent;
 		uint32_t mipLevels;
@@ -50,8 +50,8 @@ namespace VulkanHelper
 	};
 
 
-	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
-	SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
+	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice physicalDevice);
+	SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 	VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkImageView CreateImageView(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
 	void CreateImage(VkDevice device, VkPhysicalDevice physicalDevice, uint32_t width, uint32_t height, uint32_t mipLevels, VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
@@ -59,20 +59,20 @@ namespace VulkanHelper
 
 	//TODO: Shorten parameter list
 	void CreateTexture(CreateTextureParameter& parameter, VkImage& image, VkImageView& imageView, VkDeviceMemory& imageMemory);
-	void TransitionImageLayout(VkDevice device, VkQueue graphicsQueue, VkCommandPool commandPool, VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
+	void TransitionImageLayout(VkDevice device, VkQueue graphicsQueue, VkCommandPool globalCommandPool, VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
 
 	void CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
-	void CopyBufferToImage(VkDevice device, VkCommandPool commandPool, VkQueue graphicQueue, VkBuffer buffer, VkImage image, VkExtent2D extent);
+	void CopyBufferToImage(VkDevice device, VkCommandPool globalCommandPool, VkQueue graphicQueue, VkBuffer buffer, VkImage image, VkExtent2D extent);
 
-	void GenerateMipmaps(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicQueue, VkImage image, VkFormat imageFormat, VkExtent2D extent, uint32_t mipLevels);
+	void GenerateMipmaps(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool globalCommandPool, VkQueue graphicQueue, VkImage image, VkFormat imageFormat, VkExtent2D extent, uint32_t mipLevels);
 
 
-	void CopyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicQueue, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void CopyBuffer(VkDevice device, VkCommandPool globalCommandPool, VkQueue graphicQueue, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 	//TODO: better handling of these. Make them not one time but go in a bigger CommandBuffer
-	VkCommandBuffer BeginSingleTimeCommands(VkDevice device, VkCommandPool commandPool);
-	void EndSingleTimeCommands(VkDevice device, VkQueue graphicsQueue, VkCommandBuffer commandBuffer, VkCommandPool commandPool);
+	VkCommandBuffer BeginSingleTimeCommands(VkDevice device, VkCommandPool globalCommandPool);
+	void EndSingleTimeCommands(VkDevice device, VkQueue graphicsQueue, VkCommandBuffer commandBuffer, VkCommandPool globalCommandPool);
 	bool HasStencilComponent(VkFormat format);
 
 	VkFormat FindDepthFormat(VkPhysicalDevice physicalDevice);

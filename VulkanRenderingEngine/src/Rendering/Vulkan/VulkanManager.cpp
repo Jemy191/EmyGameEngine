@@ -22,7 +22,6 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 
 	Logger::Log("Start creating vulkan state");
 
-	Logger::Log("Creating instance");
 	vulkanInstance = std::unique_ptr<VulkanInstance>(new VulkanInstance(VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT));
 
 	Logger::Log("Creating surface");
@@ -31,27 +30,21 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create window surface!");
 	}
 
-	Logger::Log("Creating physicalDevice");
-	physicalDevice = std::unique_ptr<VulkanPhysicalDevice>(new VulkanPhysicalDevice(vulkanInstance->GetInstance(), surface, suggestedMsaaSamples));
+	physicalDevice = std::unique_ptr<VulkanPhysicalDevice>(new VulkanPhysicalDevice(suggestedMsaaSamples));
+	logicalDevice = std::unique_ptr<VulkanLogicalDevice>(new VulkanLogicalDevice());
 
-	Logger::Log("Creating logicalDevice");
-	logicalDevice = std::unique_ptr<VulkanLogicalDevice>(new VulkanLogicalDevice(physicalDevice->GetVKPhysicalDevice(), surface));
-
-	Logger::Log("Creating commandPool");
-	VulkanHelper::QueueFamilyIndices queueFamilyIndices = VulkanHelper::FindQueueFamilies(physicalDevice->GetVKPhysicalDevice(), surface);
+	Logger::Log("Creating globalCommandPool");
+	VulkanHelper::QueueFamilyIndices queueFamilyIndices = VulkanHelper::FindQueueFamilies(physicalDevice->GetVKPhysicalDevice());
 	VkCommandPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
-	if (vkCreateCommandPool(logicalDevice->GetVKDevice(), &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
+	if (vkCreateCommandPool(logicalDevice->GetVKDevice(), &poolInfo, nullptr, &globalCommandPool) != VK_SUCCESS)
 	{
 		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create graphics command pool!");
 	}
 
-	Logger::Log("Creating renderPass");
-	renderPass = std::unique_ptr<VulkanRenderPass>(new VulkanRenderPass(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample()));
-
-	Logger::Log("Creating swapChain");
-	swapChain = std::unique_ptr<VulkanSwapChain>(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), commandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
+	renderPass = std::unique_ptr<VulkanRenderPass>(new VulkanRenderPass());
+	swapChain = std::unique_ptr<VulkanSwapChain>(new VulkanSwapChain(window, globalCommandPool));
 
 	Logger::Log("Creating drawCommandPools");
 	drawCommandPool.resize(swapChain->GetSwapChainFramebuffers().size());
@@ -63,51 +56,34 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 		}
 	}
 
-	Logger::Log("Creating imgui");
-	uint32_t minImageCount = VulkanHelper::QuerySwapChainSupport(physicalDevice->GetVKPhysicalDevice(), surface).capabilities.minImageCount + 1;
-	imguiStuff = std::unique_ptr<ImguiStuff>(new ImguiStuff(logicalDevice->GetVKDevice(), window, vulkanInstance->GetInstance(), physicalDevice->GetVKPhysicalDevice(), renderPass->GetVkRenderPass(), queueFamilyIndices.graphicsFamily.value(), logicalDevice->GetGraphicsQueue(), commandPool, (uint32_t)(swapChain->GetVkImages().size()), minImageCount));
+	imguiStuff = std::unique_ptr<ImguiStuff>(new ImguiStuff(window, queueFamilyIndices.graphicsFamily.value(), globalCommandPool));
 
 	Logger::Log("Creating test shader");
 	// TestMesh and shader
-	baseVertexShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "BaseVert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT));
-	baseFragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "BaseFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
-	textureColorFragShader = std::unique_ptr<VulkanShader>(new VulkanShader(logicalDevice->GetVKDevice(), "TextureColorFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
+	baseVertexShader = std::unique_ptr<VulkanShader>(new VulkanShader("BaseVert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT));
+	baseFragShader = std::unique_ptr<VulkanShader>(new VulkanShader("BaseFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
+	textureColorFragShader = std::unique_ptr<VulkanShader>(new VulkanShader("TextureColorFrag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT));
 
 	Logger::Log("Creating test GraphicPipeline");
 	basicGraphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
 	basicGraphicPipeline->AddShader(baseVertexShader.get());
 	basicGraphicPipeline->AddShader(baseFragShader.get());
-	basicGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+	basicGraphicPipeline->Create(VkPolygonMode::VK_POLYGON_MODE_FILL);
 
 	textureColorGraphicPipeline = std::unique_ptr <VulkanGraphicPipeline>(new VulkanGraphicPipeline());
 	textureColorGraphicPipeline->AddShader(baseVertexShader.get());
 	textureColorGraphicPipeline->AddShader(textureColorFragShader.get());
-	textureColorGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+	textureColorGraphicPipeline->Create(VkPolygonMode::VK_POLYGON_MODE_FILL);
 
-	Logger::Log("Creating test texture");
-	checkerTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Checker.jpg"));
-	debugTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Debug.jpg"));
-	debugNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "DebugNormalMap.jpg"));
-	//testNormalTexture = std::unique_ptr<Texture>(new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "TestNormalMap.png"));
 
 	Logger::Log("Creating test skybox");
-	skyboxMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
-	//cubeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "MultiCube.obj", Mesh::MeshFormat::OBJ));
-	//planeMesh = std::unique_ptr<Mesh>(new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), "Plane.obj", Mesh::MeshFormat::OBJ));
-	//
-	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), skyboxMesh.get(), debugTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
+	skyboxTexture = std::unique_ptr<Texture>(new Texture(globalCommandPool, "Debug.jpg"));
+	debugNormalTexture = std::unique_ptr<Texture>(new Texture(globalCommandPool, "DebugNormalMap.jpg"));
+	skyboxMesh = std::unique_ptr<Mesh>(new Mesh(globalCommandPool, "SkyBoxTest.obj", Mesh::MeshFormat::OBJ));
+	Model* testModel = new Model(skyboxMesh.get(), skyboxTexture.get(), debugNormalTexture.get(), textureColorGraphicPipeline.get());
 	testModel->position = glm::vec3(0);
 	AddModelToList(testModel);
 
-	//
-	//Model* cubeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), cubeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
-	//cubeModel->position = glm::vec3(0);
-	//AddModelToList(cubeModel);
-	//models.push_back(cubeModel);
-	//
-	//Model* planeModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), planeMesh.get(), debugTexture.get(), debugNormalTexture.get(), basicGraphicPipeline.get());
-	//planeModel->position = glm::vec3(0, 0, -3);
-	//AddModelToList(planeModel);
 
 	Logger::Log("Creating Command buffer");
 	CreateCommandBuffer();
@@ -139,7 +115,7 @@ VulkanManager::~VulkanManager()
 		vkDestroyFence(logicalDevice->GetVKDevice(), inFlightFences[i], nullptr);
 	}
 
-	vkDestroyCommandPool(logicalDevice->GetVKDevice(), commandPool, nullptr);
+	vkDestroyCommandPool(logicalDevice->GetVKDevice(), globalCommandPool, nullptr);
 
 	for (size_t i = 0; i < drawCommandPool.size(); i++)
 	{
@@ -160,7 +136,7 @@ VulkanManager::~VulkanManager()
 	Logger::Log("Vulkan destroyed");
 }
 
-void VulkanManager::RecreateSwapChain()
+/*void VulkanManager::RecreateSwapChain()
 {
 	int width = 0, height = 0;
 	while (width == 0 || height == 0)
@@ -172,7 +148,7 @@ void VulkanManager::RecreateSwapChain()
 	vkDeviceWaitIdle(logicalDevice->GetVKDevice());
 
 	renderPass.reset(new VulkanRenderPass(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample()));
-	swapChain.reset(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), commandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
+	swapChain.reset(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), globalCommandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
 
 	basicGraphicPipeline.reset(new VulkanGraphicPipeline());
 
@@ -211,7 +187,7 @@ void VulkanManager::RecreateSwapChain()
 		vkFreeCommandBuffers(logicalDevice->GetVKDevice(), drawCommandPool[i], 1, &commandBuffers[i]);
 	}
 	CreateCommandBuffer();
-}
+}*/
 
 void VulkanManager::Draw()
 {
@@ -303,7 +279,7 @@ void VulkanManager::Present(GlfwManager* window)
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
-		RecreateSwapChain();
+		//RecreateSwapChain();
 		return;
 	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
@@ -354,7 +330,7 @@ void VulkanManager::Present(GlfwManager* window)
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window->HasWindowResize())
 	{
 		window->ResetWindowHasResize();
-		RecreateSwapChain();
+		//RecreateSwapChain();
 	}
 	else if (result != VK_SUCCESS)
 	{
@@ -369,13 +345,13 @@ void VulkanManager::Present(GlfwManager* window)
 
 Model* VulkanManager::BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
-	Mesh* newMesh = new Mesh(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), meshName + ".obj", Mesh::MeshFormat::OBJ);
+	Mesh* newMesh = new Mesh(globalCommandPool, meshName + ".obj", Mesh::MeshFormat::OBJ);
 	meshList.push_back(newMesh);
 
-	Texture* newTexture = new Texture(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), commandPool, logicalDevice->GetGraphicsQueue(), textureName);
+	Texture* newTexture = new Texture(globalCommandPool, textureName);
 	textureList.push_back(newTexture);
 
-	Model* testModel = new Model(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), swapChain->GetVkImages().size(), newMesh, newTexture, debugNormalTexture.get(), basicGraphicPipeline.get());
+	Model* testModel = new Model(newMesh, newTexture, debugNormalTexture.get(), basicGraphicPipeline.get());
 
 	testModel->position = position;
 	testModel->rotation = rotation;
@@ -441,6 +417,26 @@ VkSurfaceKHR VulkanManager::GetVkSurfaceKHR() const
 	return surface;
 }
 
+VulkanPhysicalDevice* VulkanManager::GetPhysicalDevice() const
+{
+	return physicalDevice.get();
+}
+
+VulkanLogicalDevice* VulkanManager::GetLogicalDevice() const
+{
+	return logicalDevice.get();
+}
+
+VulkanSwapChain* VulkanManager::GetSwapChain() const
+{
+	return swapChain.get();
+}
+
+VulkanRenderPass* VulkanManager::GetRenderPass() const
+{
+	return renderPass.get();
+}
+
 ImguiStuff* VulkanManager::GetImguiStuff() const
 {
 	return imguiStuff.get();
@@ -464,7 +460,7 @@ void VulkanManager::CreateCommandBuffer()
 	{
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocInfo.commandPool = drawCommandPool[i];
+		allocInfo.globalCommandPool = drawCommandPool[i];
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocInfo.commandBufferCount = 1;
 

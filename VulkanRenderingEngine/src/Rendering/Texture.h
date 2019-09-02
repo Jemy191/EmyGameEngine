@@ -8,7 +8,6 @@ class Texture
 {
 private:
 	static const std::string PATH;
-	VkDevice device;
 
 	bool hasAlpha = false;
 	uint32_t mipLevels = 1;
@@ -19,7 +18,7 @@ private:
 	VkSampler textureSampler;
 
 public:
-	Texture(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicQueue, std::string name, bool createMipMap = true);
+	Texture(VkCommandPool globalCommandPool, std::string name, bool createMipMap = true);
 	~Texture();
 
 	bool GetHasAlpha() const;

@@ -1,12 +1,17 @@
 #include "Game/ImguiStuff.h"
 
 #include "Rendering/Vulkan/VulkanHelper.h"
-
 #include "Helper/Log.h"
+#include "Rendering/Vulkan/VulkanManager.h"
 
-ImguiStuff::ImguiStuff(VkDevice device, GLFWwindow* window, VkInstance instance, VkPhysicalDevice physicalDevice, VkRenderPass renderPass, uint32_t queueFamily, VkQueue queue, VkCommandPool commandPool, uint32_t imageCount, uint32_t minImageCount)
+ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily, VkCommandPool globalCommandPool)
 {
-	this->device = device;
+	Logger::Log("Creating imgui");
+	VkInstance instance = VulkanManager::GetInstance()->GetVulkanInstance()->GetInstance();
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	VkRenderPass renderPass = VulkanManager::GetInstance()->GetRenderPass()->GetVkRenderPass();
+	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
 
 	// Create Descriptor Pool
 	{
@@ -56,12 +61,12 @@ ImguiStuff::ImguiStuff(VkDevice device, GLFWwindow* window, VkInstance instance,
 	init_info.PhysicalDevice = physicalDevice;
 	init_info.Device = device;
 	init_info.QueueFamily = queueFamily;
-	init_info.Queue = queue;
+	init_info.Queue = graphicQueue;
 	init_info.PipelineCache = g_PipelineCache;
 	init_info.DescriptorPool = g_DescriptorPool;
 	init_info.Allocator = nullptr;
-	init_info.MinImageCount = minImageCount;
-	init_info.ImageCount = imageCount;
+	init_info.MinImageCount = VulkanHelper::QuerySwapChainSupport(physicalDevice).capabilities.minImageCount + 1;;
+	init_info.ImageCount = VulkanManager::GetInstance()->GetSwapChain()->GetVkImages().size();
 	init_info.CheckVkResultFn = nullptr;
 	ImGui_ImplVulkan_Init(&init_info, renderPass);
 
@@ -76,11 +81,11 @@ ImguiStuff::ImguiStuff(VkDevice device, GLFWwindow* window, VkInstance instance,
 
 	// Upload Fonts
 	{
-		VkCommandBuffer commandBuffer = VulkanHelper::BeginSingleTimeCommands(device, commandPool);
+		VkCommandBuffer commandBuffer = VulkanHelper::BeginSingleTimeCommands(device, globalCommandPool);
 
 		ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
 
-		VulkanHelper::EndSingleTimeCommands(device, queue, commandBuffer, commandPool);
+		VulkanHelper::EndSingleTimeCommands(device, graphicQueue, commandBuffer, globalCommandPool);
 
 		ImGui_ImplVulkan_DestroyFontUploadObjects();
 	}
@@ -91,7 +96,7 @@ ImguiStuff::~ImguiStuff()
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-	vkDestroyDescriptorPool(device, g_DescriptorPool, nullptr);
+	vkDestroyDescriptorPool(VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice(), g_DescriptorPool, nullptr);
 }
 
 void ImguiStuff::StartFrame()

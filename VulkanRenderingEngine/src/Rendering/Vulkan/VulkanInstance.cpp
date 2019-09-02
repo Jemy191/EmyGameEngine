@@ -12,6 +12,8 @@ const std::vector<const char*> VulkanInstance::VALIDATION_LAYERS =
 
 VulkanInstance::VulkanInstance(VkDebugUtilsMessageSeverityFlagBitsEXT validationLayerMessageMinSeverity)
 {
+	Logger::Log("Creating instance");
+
 	VulkanInstance::validationLayerMessageMinSeverity = validationLayerMessageMinSeverity;
 
 	enableValidationLayers = Setting::Get("EnableValidationLayers", false);

@@ -11,12 +11,16 @@
 
 #include <unordered_map>
 #include <array>
+#include "Rendering/Vulkan/VulkanManager.h"
 
 const std::string Mesh::PATH = "Assets/Meshs/";
 
-Mesh::Mesh(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicQueue, std::string meshName, MeshFormat meshFormat, bool isGltfBinary)
+Mesh::Mesh(VkCommandPool globalCommandPool, std::string meshName, MeshFormat meshFormat, bool isGltfBinary)
 {
-	this->device = device;
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
+
 	// load mesh
 	std::string meshPath = PATH + meshName;
 
@@ -46,7 +50,7 @@ Mesh::Mesh(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool comma
 
 	VulkanHelper::CreateBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
 
-	VulkanHelper::CopyBuffer(device, commandPool, graphicQueue, stagingBuffer, vertexBuffer, bufferSize);
+	VulkanHelper::CopyBuffer(device, globalCommandPool, graphicQueue, stagingBuffer, vertexBuffer, bufferSize);
 
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
@@ -62,7 +66,7 @@ Mesh::Mesh(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool comma
 
 	VulkanHelper::CreateBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
 
-	VulkanHelper::CopyBuffer(device, commandPool, graphicQueue, stagingBuffer, indexBuffer, bufferSize);
+	VulkanHelper::CopyBuffer(device, globalCommandPool, graphicQueue, stagingBuffer, indexBuffer, bufferSize);
 
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
@@ -70,7 +74,7 @@ Mesh::Mesh(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool comma
 
 void Mesh::GltfLoader(std::string& meshPath, bool isGltfBinary)
 {
-	using namespace tinygltf;
+	/*using namespace tinygltf;
 	Model model;
 	TinyGLTF loader;
 	std::string err;
@@ -88,7 +92,7 @@ void Mesh::GltfLoader(std::string& meshPath, bool isGltfBinary)
 	if (!err.empty())
 		Logger::Log(LogSeverity::FATAL_ERROR, "Err: " + err);
 	if (!ret)
-		Logger::Log(LogSeverity::FATAL_ERROR, "Failed to parse glTF");
+		Logger::Log(LogSeverity::FATAL_ERROR, "Failed to parse glTF");*/
 
 	//model.meshes[0].primitives[0].
 }
@@ -205,6 +209,8 @@ void Mesh::ObjLoader(std::string& meshPath)
 
 Mesh::~Mesh()
 {
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+
 	vkDestroyBuffer(device, vertexBuffer, nullptr);
 	vkFreeMemory(device, vertexBufferMemory, nullptr);
 
