@@ -6,11 +6,15 @@
 #include <optional>
 #include <json.hpp>
 #include "Log.h"
+#include "ImguiStuff.h"
 
 class SceneObject
 {
 private:
-	uint64_t ID;
+	static bool isBeingCreated;
+	static bool hasBeenInit;
+
+	uint64_t ID = 0;
 
 public:
 	std::string name = "Unamed";
@@ -18,6 +22,8 @@ public:
 	std::optional<SceneObjectReference> parent;
 	std::unordered_map<uint64_t, SceneObjectReference> childs;
 
+	virtual void Init();
+	virtual void Init(nlohmann::json data);
 	SceneObject();
 	virtual ~SceneObject();
 
@@ -29,17 +35,30 @@ public:
 	virtual std::string GetType();
 
 	virtual nlohmann::json Save();
-	virtual void Load(nlohmann::json sceneObject);
 
 	virtual void GUI();
 	virtual void Update();
 
 	static SceneObject* LoadByType(nlohmann::json data);
+	
+	template<class T>
+	static SceneObject* Create();
+
+protected:
+	virtual void Load(nlohmann::json sceneObject);
 
 private:
-
 	void MarkToRemove(SceneObject* sceneObject);
 
-private:
-
 };
+
+template<class T>
+SceneObject* SceneObject::Create()
+{
+	isBeingCreated = true;
+	SceneObject* object = new T();
+	isBeingCreated = false;
+
+	object->Init();
+	return object;
+}

@@ -1,10 +1,5 @@
 #include "SceneModel.h"
-#include "ImguiStuff.h"
 #include "VulkanManager.h"
-
-SceneModel::SceneModel() : SceneObject()
-{
-}
 
 SceneModel::~SceneModel()
 {
@@ -32,6 +27,7 @@ std::string SceneModel::GetType()
 
 void SceneModel::Update()
 {
+	SceneObject::Update();
 	if (model != nullptr)
 	{
 		model->position = transform.position;

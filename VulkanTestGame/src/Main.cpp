@@ -13,6 +13,7 @@
 #include "ImguiStuff.h"
 #include "Imgui/imgui_internal.h"
 #include <filesystem>
+#include "AssetManager.h"
 
 float camSpeed = 5;
 float lookSpeed = 0.5f;
@@ -115,6 +116,8 @@ void GUI(VulkanManager* vulkanManager)
 		}
 		ImGui::End();
 	}
+
+	AssetManager::GUI();
 }
 
 #if DEBUG

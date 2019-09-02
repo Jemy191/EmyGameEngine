@@ -1,12 +1,35 @@
 #include "SceneObject.h"
 #include "SceneModel.h"
 #include "Scene.h"
-#include "ImguiStuff.h"
+
+bool SceneObject::isBeingCreated = false;
+bool SceneObject::hasBeenInit = false;
+
+void SceneObject::Init()
+{
+	if (hasBeenInit)
+		Logger::Log(LogSeverity::ERROR, "SceneObject is already initialized.");
+
+	hasBeenInit = true;
+
+	ID = Scene::GetIDCounter();
+	Scene::IncrementIDCounter();
+}
+
+void SceneObject::Init(nlohmann::json data)
+{
+	if (hasBeenInit)
+		Logger::Log(LogSeverity::ERROR, "SceneObject is already initialized.");
+
+	hasBeenInit = true;
+
+	this->Load(data);
+}
 
 SceneObject::SceneObject()
 {
-	ID = Scene::GetIDCounter();
-	Scene::IncrementIDCounter();
+	if (isBeingCreated == false)
+		Logger::Log(LogSeverity::FATAL_ERROR, "You need to use SceneObject<T>::Create() or SceneObjectLoadByType() instead of the constructor.");
 }
 
 SceneObject::~SceneObject()
@@ -84,17 +107,19 @@ SceneObject* SceneObject::LoadByType(nlohmann::json data)
 
 	SceneObject* returnObject = nullptr;
 
+	isBeingCreated = true;
+
 	if (type == "SceneObject")
 		returnObject = new SceneObject();
 	else if (type == "SceneModel")
 		returnObject = new SceneModel();
 
+	isBeingCreated = false;
+
 	if (returnObject == nullptr)
 		Logger::Log(LogSeverity::ERROR, "Scene Object of type: " + type + " not found");
 	else
-	{
-		returnObject->Load(data);
-	}
+		returnObject->Init(data);
 
 	return returnObject;
 }

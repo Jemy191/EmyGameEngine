@@ -37,6 +37,18 @@
     <Filter Include="Fichiers d%27en-tête\Scene\SceneObject">
       <UniqueIdentifier>{05b59db4-2b1e-4d59-ae98-99b1760815b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\Asset">
+      <UniqueIdentifier>{863c095b-94f1-4b68-910d-9a8138038614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Asset">
+      <UniqueIdentifier>{ce43671e-e52f-4dad-ae78-554ee29a43aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Asset\AssetType">
+      <UniqueIdentifier>{b19af55b-0c68-46c3-bece-a4a8544dd323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Asset\AssetType">
+      <UniqueIdentifier>{e1e58259-ea6e-4bfd-9bd3-df232d593ae3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Timer.h">
@@ -138,6 +150,15 @@
     <ClInclude Include="src\SceneModel.h">
       <Filter>Fichiers d%27en-tête\Scene\SceneObject</Filter>
     </ClInclude>
+    <ClInclude Include="src\AssetManager.h">
+      <Filter>Fichiers d%27en-tête\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Asset.h">
+      <Filter>Fichiers d%27en-tête\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshAsset.h">
+      <Filter>Fichiers d%27en-tête\Asset\AssetType</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Timer.cpp">
@@ -232,6 +253,15 @@
     </ClCompile>
     <ClCompile Include="src\SceneModel.cpp">
       <Filter>Fichiers sources\Scene\SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetManager.cpp">
+      <Filter>Fichiers sources\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Asset.cpp">
+      <Filter>Fichiers sources\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshAsset.cpp">
+      <Filter>Fichiers sources\Asset\AssetType</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

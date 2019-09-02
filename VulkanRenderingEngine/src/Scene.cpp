@@ -122,10 +122,10 @@ void Scene::GUI()
 {
 	ImGui::PushID(this);
 	if (ImGui::Button("Add Scene Object"))
-		Add(new SceneObject());
+		Add(SceneObject::Create<SceneObject>());
 	ImGui::SameLine();
 	if (ImGui::Button("Add Scene Model"))
-		Add(new SceneModel());
+		Add(SceneObject::Create<SceneModel>());
 
 	if (ImGui::Button("Save Scene"))
 		Save();
@@ -171,7 +171,7 @@ void Scene::Load()
 {
 	using json = nlohmann::json;
 
-	std::ifstream input("Assets/Scenes/" + name + ".json");
+	std::ifstream input(PATH + name + ".json");
 	
 	if (input.fail())
 	{
