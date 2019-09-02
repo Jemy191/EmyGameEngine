@@ -3,6 +3,7 @@
 #include "ImguiStuff.h"
 #include "MeshAsset.h"
 #include <filesystem>
+#include "Setting.h"
 
 uint64_t AssetManager::IDCounter = 0;
 
@@ -12,6 +13,11 @@ bool AssetManager::assetManagerWindowOpen = true;
 
 std::string AssetManager::assetToLoad;
 
+void AssetManager::Init()
+{
+	IDCounter = Setting::Get("IDCounter");
+}
+
 uint64_t AssetManager::GetIDCounter()
 {
 	return IDCounter;
@@ -20,6 +26,7 @@ uint64_t AssetManager::GetIDCounter()
 void AssetManager::IncrementIDCounter()
 {
 	IDCounter++;
+	Setting::Add("IDCounter", IDCounter);
 }
 
 std::shared_ptr<Asset> AssetManager::Get(uint64_t ID)

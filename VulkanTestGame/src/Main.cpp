@@ -14,6 +14,7 @@
 #include "Imgui/imgui_internal.h"
 #include <filesystem>
 #include "AssetManager.h"
+#include <Setting.h>
 
 float camSpeed = 5;
 float lookSpeed = 0.5f;
@@ -90,7 +91,7 @@ void GUI(VulkanManager* vulkanManager)
 
 				if (ImGui::Button(buttonText.c_str()))
 				{
-					if(Scene::GetCurrentScene() != nullptr)
+					if (Scene::GetCurrentScene() != nullptr)
 						delete Scene::GetCurrentScene();
 					new Scene(sceneToLoad);
 					sceneToLoad = "";
@@ -126,12 +127,15 @@ int main()
 int WinMain()
 #endif
 {
-	Logger::Open();
-	GlfwManager glfwManager = GlfwManager(1600, 900, "TestGame");
-	VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
-
 	try
 	{
+		Logger::Open();
+		Setting::Load();
+		AssetManager::Init();
+
+		GlfwManager glfwManager = GlfwManager(1600, 900, "TestGame");
+		VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
+
 		double mousePosX, mousePosY;
 		glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
 		glm::vec2 lastMousePos = glm::vec2(mousePosX, mousePosY);
@@ -204,6 +208,8 @@ int WinMain()
 			FPSCounter::StopCounting();
 		}
 		vulkanManager.WaitForIdle();
+
+		Setting::Save();
 	}
 	catch (const std::exception& e)
 	{

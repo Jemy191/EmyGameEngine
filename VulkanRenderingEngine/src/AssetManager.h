@@ -15,6 +15,8 @@ private:
 	static std::string assetToLoad;
 
 public:
+	static void Init();
+
 	static uint64_t GetIDCounter();
 	static void IncrementIDCounter();
 

@@ -159,6 +159,9 @@
     <ClInclude Include="src\MeshAsset.h">
       <Filter>Fichiers d%27en-tête\Asset\AssetType</Filter>
     </ClInclude>
+    <ClInclude Include="src\Setting.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Timer.cpp">
@@ -262,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="src\MeshAsset.cpp">
       <Filter>Fichiers sources\Asset\AssetType</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Setting.cpp">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

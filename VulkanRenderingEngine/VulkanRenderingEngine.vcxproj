@@ -108,6 +108,7 @@
     <ClInclude Include="src\SceneModel.h" />
     <ClInclude Include="src\SceneObject.h" />
     <ClInclude Include="src\SceneObjectReference.h" />
+    <ClInclude Include="src\Setting.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Transform.h" />
@@ -144,6 +145,7 @@
     <ClCompile Include="src\SceneModel.cpp" />
     <ClCompile Include="src\SceneObject.cpp" />
     <ClCompile Include="src\SceneObjectReference.cpp" />
+    <ClCompile Include="src\Setting.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Transform.cpp" />
