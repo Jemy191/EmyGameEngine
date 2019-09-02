@@ -1,20 +1,20 @@
-#include "Log.h"
+#include "Helper/Log.h"
 #include <sstream>
 
-#include <GlfwManager.h>
-#include <VulkanManager.h>
-#include <FPSCounter.h>
+#include <Rendering/GlfwManager.h>
+#include <Rendering/Vulkan/VulkanManager.h>
+#include <Helper/FPSCounter.h>
 #include <glm/gtx/rotate_vector.hpp>
 #include <json.hpp>
 #include <fstream>
 #include <iomanip>
 #include <glm/gtc/type_ptr.hpp>
-#include <Scene.h>
-#include "ImguiStuff.h"
+#include <Scene/Scene.h>
+#include "Game/ImguiStuff.h"
 #include "Imgui/imgui_internal.h"
 #include <filesystem>
-#include "AssetManager.h"
-#include <Setting.h>
+#include "Asset/AssetManager.h"
+#include <Game/Setting.h>
 
 float camSpeed = 5;
 float lookSpeed = 0.5f;
@@ -126,7 +126,7 @@ int main()
 #else
 int WinMain()
 #endif
-{
+{ 
 	try
 	{
 		Logger::Open();

@@ -51,24 +51,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Timer.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GlfwManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FPSCounter.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Texture.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Model.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="src\Imgui\imconfig.h">
       <Filter>Fichiers d%27en-tête\Imgui</Filter>
     </ClInclude>
@@ -93,95 +75,95 @@
     <ClInclude Include="src\Imgui\imstb_truetype.h">
       <Filter>Fichiers d%27en-tête\Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\VulkanSwapChain.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanDescriptor.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanGraphicPipeline.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanHelper.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanInstance.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanLayoutBinding.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanLogicalDevice.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanManager.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanPhysicalDevice.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanRenderPass.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanShader.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Log.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene.h">
-      <Filter>Fichiers d%27en-tête\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SceneObject.h">
-      <Filter>Fichiers d%27en-tête\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Transform.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SceneObjectReference.h">
-      <Filter>Fichiers d%27en-tête\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="src\Imgui\imgui_stdlib.h">
       <Filter>Fichiers d%27en-tête\Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\ImguiStuff.h">
-      <Filter>Fichiers d%27en-tête\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SceneModel.h">
-      <Filter>Fichiers d%27en-tête\Scene\SceneObject</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AssetManager.h">
+    <ClInclude Include="src\Asset\Asset.h">
       <Filter>Fichiers d%27en-tête\Asset</Filter>
     </ClInclude>
-    <ClInclude Include="src\Asset.h">
+    <ClInclude Include="src\Asset\AssetManager.h">
       <Filter>Fichiers d%27en-tête\Asset</Filter>
     </ClInclude>
-    <ClInclude Include="src\MeshAsset.h">
+    <ClInclude Include="src\Asset\MeshAsset.h">
       <Filter>Fichiers d%27en-tête\Asset\AssetType</Filter>
     </ClInclude>
-    <ClInclude Include="src\Setting.h">
+    <ClInclude Include="src\Scene\SceneModel.h">
+      <Filter>Fichiers d%27en-tête\Scene\SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\SceneObject.h">
+      <Filter>Fichiers d%27en-tête\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\SceneObjectReference.h">
+      <Filter>Fichiers d%27en-tête\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Scene.h">
+      <Filter>Fichiers d%27en-tête\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helper\FPSCounter.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helper\Log.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanDescriptor.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanGraphicPipeline.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanHelper.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanInstance.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanLayoutBinding.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanLogicalDevice.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanManager.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanPhysicalDevice.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanRenderPass.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanShader.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanSwapChain.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Mesh.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Model.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Texture.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helper\Timer.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Transform.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\ImguiStuff.h">
+      <Filter>Fichiers d%27en-tête\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Setting.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\GlfwManager.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Timer.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GlfwManager.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FPSCounter.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Mesh.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Model.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="src\Imgui\imgui.cpp">
       <Filter>Fichiers sources\Imgui</Filter>
     </ClCompile>
@@ -200,73 +182,91 @@
     <ClCompile Include="src\Imgui\imgui_demo.cpp">
       <Filter>Fichiers sources\Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\VulkanDescriptor.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanGraphicPipeline.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanHelper.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanInstance.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanLayoutBinding.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanLogicalDevice.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanManager.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanPhysicalDevice.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanRenderPass.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanShader.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanSwapChain.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Log.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene.cpp">
-      <Filter>Fichiers sources\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneObject.cpp">
-      <Filter>Fichiers sources\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Transform.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneObjectReference.cpp">
-      <Filter>Fichiers sources\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Imgui\imgui_stdlib.cpp">
       <Filter>Fichiers sources\Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\ImguiStuff.cpp">
-      <Filter>Fichiers sources\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneModel.cpp">
-      <Filter>Fichiers sources\Scene\SceneObject</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AssetManager.cpp">
+    <ClCompile Include="src\Asset\Asset.cpp">
       <Filter>Fichiers sources\Asset</Filter>
     </ClCompile>
-    <ClCompile Include="src\Asset.cpp">
+    <ClCompile Include="src\Asset\AssetManager.cpp">
       <Filter>Fichiers sources\Asset</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeshAsset.cpp">
+    <ClCompile Include="src\Asset\MeshAsset.cpp">
       <Filter>Fichiers sources\Asset\AssetType</Filter>
     </ClCompile>
-    <ClCompile Include="src\Setting.cpp">
+    <ClCompile Include="src\Scene\SceneModel.cpp">
+      <Filter>Fichiers sources\Scene\SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SceneObject.cpp">
+      <Filter>Fichiers sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SceneObjectReference.cpp">
+      <Filter>Fichiers sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Scene.cpp">
+      <Filter>Fichiers sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helper\FPSCounter.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helper\Log.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanDescriptor.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanGraphicPipeline.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanHelper.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanInstance.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanLayoutBinding.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanLogicalDevice.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanManager.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanPhysicalDevice.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanRenderPass.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanShader.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanSwapChain.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Mesh.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Model.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Texture.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helper\Timer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\ImguiStuff.cpp">
+      <Filter>Fichiers sources\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Setting.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Transform.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\GlfwManager.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
