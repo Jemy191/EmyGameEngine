@@ -10,7 +10,7 @@ private:
 
 public:
 	static void Add(std::string name, nlohmann::json input);
-	static nlohmann::json Get(std::string name);
+	static nlohmann::json Get(std::string name, nlohmann::json defaultSetting);
 	static void Save();
 	static void Load();
 

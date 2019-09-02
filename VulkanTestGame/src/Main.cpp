@@ -121,7 +121,7 @@ void GUI(VulkanManager* vulkanManager)
 	AssetManager::GUI();
 }
 
-#if DEBUG
+#if CONSOLE
 int main()
 #else
 int WinMain()

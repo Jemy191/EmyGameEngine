@@ -6,11 +6,7 @@
 class VulkanInstance
 {
 public:
-#if DEBUG
-	static const bool ENABLE_VALIDATION_LAYERS = true;
-#else
-	static const bool ENABLE_VALIDATION_LAYERS = false;
-#endif
+	static bool enableValidationLayers;
 	static const std::vector<const char*> VALIDATION_LAYERS;
 
 private:

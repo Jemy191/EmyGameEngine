@@ -1,6 +1,8 @@
 #include "VulkanInstance.h"
 #include "Log.h"
+#include "Setting.h"
 
+bool VulkanInstance::enableValidationLayers = false;
 VkDebugUtilsMessageSeverityFlagBitsEXT VulkanInstance::validationLayerMessageMinSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
 
 const std::vector<const char*> VulkanInstance::VALIDATION_LAYERS =
@@ -12,7 +14,9 @@ VulkanInstance::VulkanInstance(VkDebugUtilsMessageSeverityFlagBitsEXT validation
 {
 	VulkanInstance::validationLayerMessageMinSeverity = validationLayerMessageMinSeverity;
 
-	if (ENABLE_VALIDATION_LAYERS && !CheckValidationLayerSupport())
+	enableValidationLayers = Setting::Get("EnableValidationLayers", false);
+
+	if (enableValidationLayers && !CheckValidationLayerSupport())
 	{
 		Logger::Log(LogSeverity::FATAL_ERROR, "validation layers requested, but not available!");
 	}
@@ -34,7 +38,7 @@ VulkanInstance::VulkanInstance(VkDebugUtilsMessageSeverityFlagBitsEXT validation
 	createInfo.pApplicationInfo = &appInfo;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 	createInfo.ppEnabledExtensionNames = extensions.data();
-	if (ENABLE_VALIDATION_LAYERS)
+	if (enableValidationLayers)
 	{
 		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
 		PopulateDebugMessengerCreateInfo(debugCreateInfo);
@@ -59,7 +63,7 @@ VulkanInstance::VulkanInstance(VkDebugUtilsMessageSeverityFlagBitsEXT validation
 
 VulkanInstance::~VulkanInstance()
 {
-	if (ENABLE_VALIDATION_LAYERS)
+	if (enableValidationLayers)
 	{
 		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	}
@@ -81,7 +85,7 @@ std::vector<const char*> VulkanInstance::GetRequiredExtensions() const
 
 	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
-	if (ENABLE_VALIDATION_LAYERS)
+	if (enableValidationLayers)
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
 	return extensions;
@@ -89,7 +93,7 @@ std::vector<const char*> VulkanInstance::GetRequiredExtensions() const
 
 void VulkanInstance::SetupDebugMessenger()
 {
-	if (!ENABLE_VALIDATION_LAYERS) return;
+	if (!enableValidationLayers) return;
 
 	VkDebugUtilsMessengerCreateInfoEXT createInfo;
 	PopulateDebugMessengerCreateInfo(createInfo);

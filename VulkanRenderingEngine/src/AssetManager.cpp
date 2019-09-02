@@ -15,7 +15,7 @@ std::string AssetManager::assetToLoad;
 
 void AssetManager::Init()
 {
-	IDCounter = Setting::Get("IDCounter");
+	IDCounter = Setting::Get("IDCounter", 0);
 }
 
 uint64_t AssetManager::GetIDCounter()

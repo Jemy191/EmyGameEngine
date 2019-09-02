@@ -39,7 +39,7 @@ VulkanLogicalDevice::VulkanLogicalDevice(VkPhysicalDevice physicalDevice, VkSurf
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(VulkanPhysicalDevice::DEVICE_EXTENSIONS.size());
 	createInfo.ppEnabledExtensionNames = VulkanPhysicalDevice::DEVICE_EXTENSIONS.data();
 
-	if (VulkanInstance::ENABLE_VALIDATION_LAYERS)
+	if (VulkanInstance::enableValidationLayers)
 	{
 		createInfo.enabledLayerCount = static_cast<uint32_t>(VulkanInstance::VALIDATION_LAYERS.size());
 		createInfo.ppEnabledLayerNames = VulkanInstance::VALIDATION_LAYERS.data();
