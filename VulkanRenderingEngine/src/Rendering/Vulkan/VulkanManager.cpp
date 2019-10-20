@@ -512,7 +512,7 @@ void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
 	ubo.lightDir = lightDir;
 	ubo.lightColor = lightColor;
 	ubo.lightSetting = lightSetting;
-	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.0001f, 100000.0f);
+	ubo.proj = glm::perspective(glm::radians(45.0f), swapChain->GetVkExtent2D().width / (float)swapChain->GetVkExtent2D().height, 0.1f, 10000.0f);
 	ubo.view = glm::lookAt(camPos, camPos + glm::normalize(camDir), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj[1][1] *= -1;
 
