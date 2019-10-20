@@ -6,7 +6,7 @@
 #include "Helper/Log.h"
 #include "VulkanManager.h"
 
-VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommandPool)
+VulkanSwapChain::VulkanSwapChain(GLFWwindow* window)
 {
 	Logger::Log("Creating swapChain");
 
@@ -17,7 +17,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommand
 	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
 	VkRenderPass renderPass = VulkanManager::GetInstance()->GetRenderPass()->GetVkRenderPass();
 
-	VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport(physicalDevice);
+	VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport();
 
 	VkSurfaceFormatKHR surfaceFormat = VulkanHelper::ChooseSwapSurfaceFormat(swapChainSupport.formats);
 	VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
@@ -43,7 +43,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommand
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
 
-	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies(physicalDevice);
+	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies();
 	uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
 	if (indices.graphicsFamily != indices.presentFamily)
@@ -73,14 +73,11 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommand
 
 	for (uint32_t i = 0; i < swapChainImages.size(); i++)
 	{
-		swapChainImageViews[i] = VulkanHelper::CreateImageView(device, swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+		swapChainImageViews[i] = VulkanHelper::CreateImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
 	}
 
 	// FrameBuffer
 	VulkanHelper::CreateTextureParameter colorTextureParameter = {};
-	colorTextureParameter.device = device;
-	colorTextureParameter.physicalDevice = physicalDevice;
-	colorTextureParameter.globalCommandPool = globalCommandPool;
 	colorTextureParameter.extent = extent;
 	colorTextureParameter.mipLevels = 1;
 	colorTextureParameter.msaaSample = msaaSample;
@@ -88,7 +85,6 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommand
 	colorTextureParameter.tiling = VK_IMAGE_TILING_OPTIMAL;
 	colorTextureParameter.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	colorTextureParameter.properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-	colorTextureParameter.graphicsQueue = graphicQueue;
 	colorTextureParameter.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 	colorTextureParameter.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	colorTextureParameter.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -96,11 +92,8 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommand
 	VulkanHelper::CreateTexture(colorTextureParameter, colorImage, colorImageView, colorImageMemory);
 
 
-	VkFormat depthFormat = VulkanHelper::FindDepthFormat(physicalDevice);
+	VkFormat depthFormat = VulkanHelper::FindDepthFormat();
 	VulkanHelper::CreateTextureParameter depthTextureParameter = {};
-	depthTextureParameter.device = device;
-	depthTextureParameter.physicalDevice = physicalDevice;
-	depthTextureParameter.globalCommandPool = globalCommandPool;
 	depthTextureParameter.extent = extent;
 	depthTextureParameter.mipLevels = 1;
 	depthTextureParameter.msaaSample = msaaSample;
@@ -108,7 +101,6 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommand
 	depthTextureParameter.tiling = VK_IMAGE_TILING_OPTIMAL;
 	depthTextureParameter.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	depthTextureParameter.properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-	depthTextureParameter.graphicsQueue = graphicQueue;
 	depthTextureParameter.aspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT;
 	depthTextureParameter.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	depthTextureParameter.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;

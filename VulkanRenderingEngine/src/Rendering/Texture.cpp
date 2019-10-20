@@ -16,9 +16,6 @@ const std::string Texture::PATH = "Assets/Textures/";
 Texture::Texture(std::string name, bool createMipMap)
 {
 	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
-	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
-	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
-	VkCommandPool globalCommandPool = VulkanManager::GetInstance()->GetGlobalCommandPool();
 
 	std::string filename = PATH + name;
 
@@ -36,7 +33,7 @@ Texture::Texture(std::string name, bool createMipMap)
 
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
-	VulkanHelper::CreateBuffer(device, physicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	VulkanHelper::CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	// Move texture data to the GPU
 	void* data;
@@ -53,9 +50,6 @@ Texture::Texture(std::string name, bool createMipMap)
 	};
 	
 	VulkanHelper::CreateTextureParameter textureParameter = {};
-	textureParameter.device = device;
-	textureParameter.physicalDevice = physicalDevice;
-	textureParameter.globalCommandPool = globalCommandPool;
 	textureParameter.extent = extent;
 	textureParameter.mipLevels = mipLevels;
 	textureParameter.msaaSample = VK_SAMPLE_COUNT_1_BIT;
@@ -63,20 +57,19 @@ Texture::Texture(std::string name, bool createMipMap)
 	textureParameter.tiling = VK_IMAGE_TILING_OPTIMAL;
 	textureParameter.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	textureParameter.properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-	textureParameter.graphicsQueue = graphicQueue;
 	textureParameter.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 	textureParameter.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	textureParameter.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 
 	VulkanHelper::CreateTexture(textureParameter, textureImage, textureImageView, textureImageMemory);
 
-	VulkanHelper::CopyBufferToImage(device, globalCommandPool, graphicQueue, stagingBuffer, textureImage, extent);
+	VulkanHelper::CopyBufferToImage(stagingBuffer, textureImage, extent);
 	//transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
 
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
 
-	VulkanHelper::GenerateMipmaps(device, physicalDevice, globalCommandPool, graphicQueue, textureImage, VK_FORMAT_R8G8B8A8_UNORM, extent, mipLevels);
+	VulkanHelper::GenerateMipmaps(textureImage, VK_FORMAT_R8G8B8A8_UNORM, extent, mipLevels);
 
 	VkSamplerCreateInfo samplerInfo = {};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;

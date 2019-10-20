@@ -14,7 +14,7 @@ VulkanLogicalDevice::VulkanLogicalDevice()
 	Logger::Log("Creating logicalDevice");
 	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
 
-	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies(physicalDevice);
+	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies();
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};

@@ -4,7 +4,7 @@
 #include "Helper/Log.h"
 #include "Rendering/Vulkan/VulkanManager.h"
 
-ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily, VkCommandPool globalCommandPool)
+ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily)
 {
 	Logger::Log("Creating imgui");
 	VkInstance instance = VulkanManager::GetInstance()->GetVulkanInstance()->GetInstance();
@@ -65,7 +65,7 @@ ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily, VkCommandPool g
 	init_info.PipelineCache = g_PipelineCache;
 	init_info.DescriptorPool = g_DescriptorPool;
 	init_info.Allocator = nullptr;
-	init_info.MinImageCount = VulkanHelper::QuerySwapChainSupport(physicalDevice).capabilities.minImageCount + 1;;
+	init_info.MinImageCount = VulkanHelper::QuerySwapChainSupport().capabilities.minImageCount + 1;;
 	init_info.ImageCount = VulkanManager::GetInstance()->GetSwapChain()->GetVkImages().size();
 	init_info.CheckVkResultFn = nullptr;
 	ImGui_ImplVulkan_Init(&init_info, renderPass);
@@ -81,11 +81,11 @@ ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily, VkCommandPool g
 
 	// Upload Fonts
 	{
-		VkCommandBuffer commandBuffer = VulkanHelper::BeginSingleTimeCommands(device, globalCommandPool);
+		VkCommandBuffer commandBuffer = VulkanHelper::BeginSingleTimeCommands();
 
 		ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
 
-		VulkanHelper::EndSingleTimeCommands(device, graphicQueue, commandBuffer, globalCommandPool);
+		VulkanHelper::EndSingleTimeCommands(commandBuffer);
 
 		ImGui_ImplVulkan_DestroyFontUploadObjects();
 	}

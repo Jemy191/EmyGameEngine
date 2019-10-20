@@ -10,7 +10,7 @@
 class ImguiStuff
 {
 public:
-	ImguiStuff(GLFWwindow* window, uint32_t queueFamily, VkCommandPool globalCommandPool);
+	ImguiStuff(GLFWwindow* window, uint32_t queueFamily);
 	~ImguiStuff();
 
 	void StartFrame();

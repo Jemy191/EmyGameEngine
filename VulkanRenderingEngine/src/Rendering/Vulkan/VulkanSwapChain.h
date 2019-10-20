@@ -22,7 +22,7 @@ private:
 	VkImageView depthImageView = nullptr;
 
 public:
-	VulkanSwapChain(GLFWwindow* window, VkCommandPool globalCommandPool);
+	VulkanSwapChain(GLFWwindow* window);
 	~VulkanSwapChain();
 
 	VkSwapchainKHR GetVkSwapchainKHR() const;

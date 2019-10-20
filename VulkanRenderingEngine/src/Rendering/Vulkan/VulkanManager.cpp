@@ -34,7 +34,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	logicalDevice = std::unique_ptr<VulkanLogicalDevice>(new VulkanLogicalDevice());
 
 	Logger::Log("Creating globalCommandPool");
-	VulkanHelper::QueueFamilyIndices queueFamilyIndices = VulkanHelper::FindQueueFamilies(physicalDevice->GetVKPhysicalDevice());
+	VulkanHelper::QueueFamilyIndices queueFamilyIndices = VulkanHelper::FindQueueFamilies();
 	VkCommandPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
@@ -44,7 +44,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	}
 
 	renderPass = std::unique_ptr<VulkanRenderPass>(new VulkanRenderPass());
-	swapChain = std::unique_ptr<VulkanSwapChain>(new VulkanSwapChain(window, globalCommandPool));
+	swapChain = std::unique_ptr<VulkanSwapChain>(new VulkanSwapChain(window));
 
 	Logger::Log("Creating drawCommandPools");
 	drawCommandPool.resize(swapChain->GetSwapChainFramebuffers().size());
@@ -56,7 +56,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 		}
 	}
 
-	imguiStuff = std::unique_ptr<ImguiStuff>(new ImguiStuff(window, queueFamilyIndices.graphicsFamily.value(), globalCommandPool));
+	imguiStuff = std::unique_ptr<ImguiStuff>(new ImguiStuff(window, queueFamilyIndices.graphicsFamily.value()));
 
 	Logger::Log("Creating test shader");
 	// TestMesh and shader
