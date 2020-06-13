@@ -13,5 +13,5 @@ public:
 	VulkanRenderPass();
 	~VulkanRenderPass();
 
-	VkRenderPass GetVkRenderPass() const;
+	VkRenderPass GetVk() const;
 };

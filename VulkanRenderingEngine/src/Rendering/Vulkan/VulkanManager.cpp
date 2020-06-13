@@ -25,7 +25,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	vulkanInstance = std::unique_ptr<VulkanInstance>(new VulkanInstance(VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT));
 
 	Logger::Log("Creating surface");
-	if (glfwCreateWindowSurface(vulkanInstance->GetInstance(), window, nullptr, &surface) != VK_SUCCESS)
+	if (glfwCreateWindowSurface(vulkanInstance->GetVk(), window, nullptr, &surface) != VK_SUCCESS)
 	{
 		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create window surface!");
 	}
@@ -38,7 +38,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	VkCommandPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
-	if (vkCreateCommandPool(logicalDevice->GetVKDevice(), &poolInfo, nullptr, &globalCommandPool) != VK_SUCCESS)
+	if (vkCreateCommandPool(logicalDevice->GetVk(), &poolInfo, nullptr, &globalCommandPool) != VK_SUCCESS)
 	{
 		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create graphics command pool!");
 	}
@@ -50,7 +50,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	drawCommandPool.resize(swapChain->GetSwapChainFramebuffers().size());
 	for (size_t i = 0; i < swapChain->GetSwapChainFramebuffers().size(); i++)
 	{
-		if (vkCreateCommandPool(logicalDevice->GetVKDevice(), &poolInfo, nullptr, &drawCommandPool[i]) != VK_SUCCESS)
+		if (vkCreateCommandPool(logicalDevice->GetVk(), &poolInfo, nullptr, &drawCommandPool[i]) != VK_SUCCESS)
 		{
 			Logger::Log(LogSeverity::FATAL_ERROR, "failed to create graphics command pool!");
 		}
@@ -99,27 +99,27 @@ VulkanManager::~VulkanManager()
 	skyboxMesh.reset();
 	swapChain.reset();
 	modelList.clear();
-	vkDestroySurfaceKHR(vulkanInstance->GetInstance(), surface, nullptr);
+	vkDestroySurfaceKHR(vulkanInstance->GetVk(), surface, nullptr);
 	baseVertexShader.reset();
 	baseFragShader.reset();
 
 	for (size_t i = 0; i < commandBuffers.size(); i++)
 	{
-		vkFreeCommandBuffers(logicalDevice->GetVKDevice(), drawCommandPool[i], 1 , &commandBuffers[i]);
+		vkFreeCommandBuffers(logicalDevice->GetVk(), drawCommandPool[i], 1 , &commandBuffers[i]);
 	}
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		vkDestroySemaphore(logicalDevice->GetVKDevice(), renderFinishedSemaphores[i], nullptr);
-		vkDestroySemaphore(logicalDevice->GetVKDevice(), imageAvailableSemaphores[i], nullptr);
-		vkDestroyFence(logicalDevice->GetVKDevice(), inFlightFences[i], nullptr);
+		vkDestroySemaphore(logicalDevice->GetVk(), renderFinishedSemaphores[i], nullptr);
+		vkDestroySemaphore(logicalDevice->GetVk(), imageAvailableSemaphores[i], nullptr);
+		vkDestroyFence(logicalDevice->GetVk(), inFlightFences[i], nullptr);
 	}
 
-	vkDestroyCommandPool(logicalDevice->GetVKDevice(), globalCommandPool, nullptr);
+	vkDestroyCommandPool(logicalDevice->GetVk(), globalCommandPool, nullptr);
 
 	for (size_t i = 0; i < drawCommandPool.size(); i++)
 	{
-		vkDestroyCommandPool(logicalDevice->GetVKDevice(), drawCommandPool[i], nullptr);
+		vkDestroyCommandPool(logicalDevice->GetVk(), drawCommandPool[i], nullptr);
 	}
 
 	for (size_t i = 0; i < meshList.size(); i++)
@@ -145,17 +145,17 @@ VulkanManager::~VulkanManager()
 		glfwWaitEvents();
 	}
 
-	vkDeviceWaitIdle(logicalDevice->GetVKDevice());
+	vkDeviceWaitIdle(logicalDevice->GetVk());
 
-	renderPass.reset(new VulkanRenderPass(logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample()));
-	swapChain.reset(new VulkanSwapChain(window, logicalDevice->GetVKDevice(), physicalDevice->GetVKPhysicalDevice(), surface, physicalDevice->GetMsaaSample(), globalCommandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVkRenderPass()));
+	renderPass.reset(new VulkanRenderPass(logicalDevice->GetVk(), physicalDevice->GetVk(), surface, physicalDevice->GetMsaaSample()));
+	swapChain.reset(new VulkanSwapChain(window, logicalDevice->GetVk(), physicalDevice->GetVk(), surface, physicalDevice->GetMsaaSample(), globalCommandPool, logicalDevice->GetGraphicsQueue(), renderPass->GetVk()));
 
 	basicGraphicPipeline.reset(new VulkanGraphicPipeline());
 
 	basicGraphicPipeline->AddShader(baseVertexShader.get());
 	basicGraphicPipeline->AddShader(baseFragShader.get());
 
-	basicGraphicPipeline->Create(logicalDevice->GetVKDevice(), swapChain->GetVkExtent2D(), renderPass->GetVkRenderPass(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
+	basicGraphicPipeline->Create(logicalDevice->GetVk(), swapChain->GetVkExtent2D(), renderPass->GetVk(), physicalDevice->GetMsaaSample(), VkPolygonMode::VK_POLYGON_MODE_FILL);
 
 	//TODO: make a function for that
 	// Recreate stuff in model
@@ -184,7 +184,7 @@ VulkanManager::~VulkanManager()
 
 	for (size_t i = 0; i < commandBuffers.size(); i++)
 	{
-		vkFreeCommandBuffers(logicalDevice->GetVKDevice(), drawCommandPool[i], 1, &commandBuffers[i]);
+		vkFreeCommandBuffers(logicalDevice->GetVk(), drawCommandPool[i], 1, &commandBuffers[i]);
 	}
 	CreateCommandBuffer();
 }*/
@@ -193,7 +193,7 @@ void VulkanManager::Draw()
 {
 	for (size_t i = 0; i < commandBuffers.size(); i++)
 	{
-		vkResetCommandPool(logicalDevice->GetVKDevice(), drawCommandPool[i], 0);
+		vkResetCommandPool(logicalDevice->GetVk(), drawCommandPool[i], 0);
 
 		VkCommandBufferBeginInfo beginInfo = {};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -206,7 +206,7 @@ void VulkanManager::Draw()
 
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = renderPass->GetVkRenderPass();
+		renderPassInfo.renderPass = renderPass->GetVk();
 		renderPassInfo.framebuffer = swapChain->GetSwapChainFramebuffers()[i];
 		renderPassInfo.renderArea.offset = {0, 0};
 		renderPassInfo.renderArea.extent = swapChain->GetVkExtent2D();
@@ -272,10 +272,10 @@ void VulkanManager::Present(GlfwManager* window)
 		modelToBeRemove.clear();
 	}
 
-	vkWaitForFences(logicalDevice->GetVKDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+	vkWaitForFences(logicalDevice->GetVk(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 	uint32_t imageIndex;
-	VkResult result = vkAcquireNextImageKHR(logicalDevice->GetVKDevice(), swapChain->GetVkSwapchainKHR(), std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(logicalDevice->GetVk(), swapChain->GetVkSwapchainKHR(), std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
@@ -305,7 +305,7 @@ void VulkanManager::Present(GlfwManager* window)
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	vkResetFences(logicalDevice->GetVKDevice(), 1, &inFlightFences[currentFrame]);
+	vkResetFences(logicalDevice->GetVk(), 1, &inFlightFences[currentFrame]);
 	
 	Draw();
 	if (vkQueueSubmit(logicalDevice->GetGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
@@ -449,7 +449,7 @@ ImguiStuff* VulkanManager::GetImguiStuff() const
 
 void VulkanManager::WaitForIdle()
 {
-	vkDeviceWaitIdle(logicalDevice->GetVKDevice());
+	vkDeviceWaitIdle(logicalDevice->GetVk());
 }
 
 VulkanManager* VulkanManager::GetInstance()
@@ -469,7 +469,7 @@ void VulkanManager::CreateCommandBuffer()
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocInfo.commandBufferCount = 1;
 
-		if (vkAllocateCommandBuffers(logicalDevice->GetVKDevice(), &allocInfo, &commandBuffers[i]) != VK_SUCCESS)
+		if (vkAllocateCommandBuffers(logicalDevice->GetVk(), &allocInfo, &commandBuffers[i]) != VK_SUCCESS)
 		{
 			Logger::Log(LogSeverity::FATAL_ERROR, "failed to allocate command buffers!");
 		}
@@ -491,9 +491,9 @@ void VulkanManager::CreateSyncObject()
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		if (vkCreateSemaphore(logicalDevice->GetVKDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-			vkCreateSemaphore(logicalDevice->GetVKDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-			vkCreateFence(logicalDevice->GetVKDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
+		if (vkCreateSemaphore(logicalDevice->GetVk(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+			vkCreateSemaphore(logicalDevice->GetVk(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+			vkCreateFence(logicalDevice->GetVk(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
 		{
 			Logger::Log(LogSeverity::FATAL_ERROR, "failed to create synchronization objects for a frame!");
 		}

@@ -17,8 +17,8 @@ const std::string Mesh::PATH = "Assets/Meshs/";
 
 Mesh::Mesh(std::string meshName, MeshFormat meshFormat, bool isGltfBinary)
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
-	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
 	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
 	VkCommandPool globalCommandPool = VulkanManager::GetInstance()->GetGlobalCommandPool();
 
@@ -210,7 +210,7 @@ void Mesh::ObjLoader(std::string& meshPath)
 
 Mesh::~Mesh()
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 
 	vkDestroyBuffer(device, vertexBuffer, nullptr);
 	vkFreeMemory(device, vertexBufferMemory, nullptr);

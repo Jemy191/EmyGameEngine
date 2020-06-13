@@ -19,7 +19,7 @@ public:
 	VulkanInstance(VkDebugUtilsMessageSeverityFlagBitsEXT validationLayerMessageMinSeverity);
 	~VulkanInstance();
 
-	VkInstance GetInstance() const;
+	VkInstance GetVk() const;
 
 private:
 	std::vector<const char*> GetRequiredExtensions() const;

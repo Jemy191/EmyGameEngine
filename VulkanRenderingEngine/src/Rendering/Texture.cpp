@@ -15,7 +15,7 @@ const std::string Texture::PATH = "Assets/Textures/";
 
 Texture::Texture(std::string name, bool createMipMap)
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 
 	std::string filename = PATH + name;
 
@@ -97,7 +97,7 @@ Texture::Texture(std::string name, bool createMipMap)
 
 Texture::~Texture()
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 
 	vkDestroyImage(device, textureImage, nullptr);
 	vkFreeMemory(device, textureImageMemory, nullptr);

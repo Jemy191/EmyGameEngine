@@ -75,7 +75,7 @@ VulkanInstance::~VulkanInstance()
 	Logger::Log("Vulkan instance destroyed");
 }
 
-VkInstance VulkanInstance::GetInstance() const
+VkInstance VulkanInstance::GetVk() const
 {
 	return instance;
 }

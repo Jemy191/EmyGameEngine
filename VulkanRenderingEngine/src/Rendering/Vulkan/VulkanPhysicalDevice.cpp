@@ -14,7 +14,7 @@ const std::vector<const char*> VulkanPhysicalDevice::DEVICE_EXTENSIONS =
 VulkanPhysicalDevice::VulkanPhysicalDevice(VkSampleCountFlagBits msaaSamples)
 {
 	Logger::Log("Creating physicalDevice");
-	VkInstance instance = VulkanManager::GetInstance()->GetVulkanInstance()->GetInstance();
+	VkInstance instance = VulkanManager::GetInstance()->GetVulkanInstance()->GetVk();
 
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -74,7 +74,7 @@ VkSampleCountFlagBits VulkanPhysicalDevice::GetMaxUsableSampleCount() const
 	return VK_SAMPLE_COUNT_1_BIT;
 }
 
-VkPhysicalDevice VulkanPhysicalDevice::GetVKPhysicalDevice() const
+VkPhysicalDevice VulkanPhysicalDevice::GetVk() const
 {
 	return physicalDevice;
 }

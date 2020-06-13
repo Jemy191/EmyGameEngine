@@ -7,7 +7,7 @@ namespace VulkanHelper
 {
 	QueueFamilyIndices FindQueueFamilies()
 	{
-		return FindQueueFamilies(VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice());
+		return FindQueueFamilies(VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk());
 	}
 	QueueFamilyIndices VulkanHelper::FindQueueFamilies(VkPhysicalDevice physicalDevice)
 	{
@@ -50,7 +50,7 @@ namespace VulkanHelper
 
 	SwapChainSupportDetails QuerySwapChainSupport()
 	{
-		return QuerySwapChainSupport(VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice());
+		return QuerySwapChainSupport(VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk());
 	}
 
 	SwapChainSupportDetails VulkanHelper::QuerySwapChainSupport(VkPhysicalDevice device)
@@ -95,7 +95,7 @@ namespace VulkanHelper
 
 	VkImageView VulkanHelper::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels)
 	{
-		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 
 		VkImageViewCreateInfo viewInfo = {};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -119,8 +119,8 @@ namespace VulkanHelper
 
 	void VulkanHelper::CreateImage(CreateTextureParameter& parameter, VkImage& image, VkDeviceMemory& imageMemory)
 	{
-		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
-		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
+		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 
 		VkImageCreateInfo imageInfo = {};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -160,7 +160,7 @@ namespace VulkanHelper
 
 	uint32_t VulkanHelper::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 	{
-		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
 
 		VkPhysicalDeviceMemoryProperties memProperties;
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -185,7 +185,7 @@ namespace VulkanHelper
 
 	void VulkanHelper::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels)
 	{
-		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 		VkCommandPool globalCommandPool = VulkanManager::GetInstance()->GetGlobalCommandPool();
 
 		VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
@@ -270,8 +270,8 @@ namespace VulkanHelper
 
 	void VulkanHelper::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 	{
-		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
-		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
+		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 
 		VkBufferCreateInfo bufferInfo = {};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -323,7 +323,7 @@ namespace VulkanHelper
 
 	void VulkanHelper::GenerateMipmaps(VkImage image, VkFormat imageFormat, VkExtent2D extent, uint32_t mipLevels)
 	{
-		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
 
 		// Check if image format supports linear blitting
 		VkFormatProperties formatProperties;
@@ -426,7 +426,7 @@ namespace VulkanHelper
 
 	VkCommandBuffer VulkanHelper::BeginSingleTimeCommands()
 	{
-		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 		VkCommandPool globalCommandPool = VulkanManager::GetInstance()->GetGlobalCommandPool();
 
 		VkCommandBufferAllocateInfo allocInfo = {};
@@ -450,7 +450,7 @@ namespace VulkanHelper
 	void VulkanHelper::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
 	{
 		VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
-		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
+		VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
 		VkCommandPool globalCommandPool = VulkanManager::GetInstance()->GetGlobalCommandPool();
 
 		vkEndCommandBuffer(commandBuffer);
@@ -482,7 +482,7 @@ namespace VulkanHelper
 
 	VkFormat VulkanHelper::FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
 	{
-		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+		VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
 
 		for (VkFormat format : candidates)
 		{

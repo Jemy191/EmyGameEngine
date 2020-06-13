@@ -9,8 +9,8 @@
 VulkanRenderPass::VulkanRenderPass()
 {
 	Logger::Log("Creating renderPass");
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
-	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
 	VkSampleCountFlagBits msaaSamples = VulkanManager::GetInstance()->GetPhysicalDevice()->GetMsaaSample();
 
 	VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport();
@@ -92,12 +92,12 @@ VulkanRenderPass::VulkanRenderPass()
 
 VulkanRenderPass::~VulkanRenderPass()
 {
-	vkDestroyRenderPass(VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice(), renderPass, nullptr);
+	vkDestroyRenderPass(VulkanManager::GetInstance()->GetLogicalDevice()->GetVk(), renderPass, nullptr);
 
 	Logger::Log("Render pass destroyed");
 }
 
-VkRenderPass VulkanRenderPass::GetVkRenderPass() const
+VkRenderPass VulkanRenderPass::GetVk() const
 {
 	return renderPass;
 }

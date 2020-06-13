@@ -13,7 +13,7 @@ public:
 	VulkanLogicalDevice();
 	~VulkanLogicalDevice();
 
-	VkDevice GetVKDevice() const;
+	VkDevice GetVk() const;
 	VkQueue GetGraphicsQueue() const;
 	VkQueue GetPresentQueue() const;
 };

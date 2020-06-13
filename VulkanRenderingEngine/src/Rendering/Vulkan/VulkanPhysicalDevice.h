@@ -20,7 +20,7 @@ public:
 
 	VkSampleCountFlagBits GetMsaaSample() const;
 	VkSampleCountFlagBits GetMaxUsableSampleCount() const;
-	VkPhysicalDevice GetVKPhysicalDevice() const;
+	VkPhysicalDevice GetVk() const;
 
 private:
 	bool IsDeviceSuitable(VkPhysicalDevice device);

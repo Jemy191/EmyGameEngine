@@ -7,10 +7,10 @@
 ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily)
 {
 	Logger::Log("Creating imgui");
-	VkInstance instance = VulkanManager::GetInstance()->GetVulkanInstance()->GetInstance();
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice();
-	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
-	VkRenderPass renderPass = VulkanManager::GetInstance()->GetRenderPass()->GetVkRenderPass();
+	VkInstance instance = VulkanManager::GetInstance()->GetVulkanInstance()->GetVk();
+	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
+	VkRenderPass renderPass = VulkanManager::GetInstance()->GetRenderPass()->GetVk();
 	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
 
 	// Create Descriptor Pool
@@ -97,7 +97,7 @@ ImguiStuff::~ImguiStuff()
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-	vkDestroyDescriptorPool(VulkanManager::GetInstance()->GetLogicalDevice()->GetVKDevice(), g_DescriptorPool, nullptr);
+	vkDestroyDescriptorPool(VulkanManager::GetInstance()->GetLogicalDevice()->GetVk(), g_DescriptorPool, nullptr);
 }
 
 void ImguiStuff::StartFrame()

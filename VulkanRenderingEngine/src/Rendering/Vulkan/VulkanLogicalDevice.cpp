@@ -12,7 +12,7 @@
 VulkanLogicalDevice::VulkanLogicalDevice()
 {
 	Logger::Log("Creating logicalDevice");
-	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVKPhysicalDevice();
+	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
 
 	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies();
 
@@ -69,7 +69,7 @@ VulkanLogicalDevice::~VulkanLogicalDevice()
 	Logger::Log("Logical device destroyed");
 }
 
-VkDevice VulkanLogicalDevice::GetVKDevice() const
+VkDevice VulkanLogicalDevice::GetVk() const
 {
 	return device;
 }
