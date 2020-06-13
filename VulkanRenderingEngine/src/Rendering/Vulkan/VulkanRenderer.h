@@ -22,6 +22,7 @@
 #include "Rendering/GlfwManager.h"
 #include "Rendering/Model.h"
 #include "Game/ImguiStuff.h"
+#include "BaseRenderer.h"
 
 class VulkanRenderer
 {

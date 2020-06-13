@@ -3,7 +3,7 @@
 #include "Rendering/Vulkan/VulkanHelper.h"
 #include "VulkanInstance.h"
 #include "VulkanPhysicalDevice.h"
-#include "VulkanManager.h"
+#include "VulkanRenderer.h"
 
 #include <vector>
 #include <set>

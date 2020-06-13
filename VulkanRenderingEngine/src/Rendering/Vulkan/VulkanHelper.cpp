@@ -1,7 +1,7 @@
 #include "Rendering/Vulkan/VulkanHelper.h"
 
 #include "Helper/Log.h"
-#include "VulkanManager.h"
+#include "VulkanRenderer.h"
 
 namespace VulkanHelper
 {

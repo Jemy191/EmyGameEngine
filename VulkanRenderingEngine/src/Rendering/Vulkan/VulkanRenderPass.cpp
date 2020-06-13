@@ -4,7 +4,7 @@
 
 #include "Helper/Log.h"
 #include <array>
-#include "VulkanManager.h"
+#include "VulkanRenderer.h"
 
 VulkanRenderPass::VulkanRenderPass()
 {

@@ -3,7 +3,7 @@
 #include "Helper/Log.h"
 #include <fstream>
 #include <memory>
-#include "VulkanManager.h"
+#include "VulkanRenderer.h"
 
 const std::string VulkanShader::PATH = "Assets/Shaders/";
 

@@ -4,7 +4,7 @@
 #include <string>
 #include "Helper/Log.h"
 #include "Rendering/Vulkan/VulkanHelper.h"
-#include "VulkanManager.h"
+#include "VulkanRenderer.h"
 
 const std::vector<const char*> VulkanPhysicalDevice::DEVICE_EXTENSIONS =
 {

@@ -123,9 +123,6 @@
     <ClInclude Include="src\Rendering\Vulkan\VulkanLogicalDevice.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Vulkan\VulkanManager.h">
-      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="src\Rendering\Vulkan\VulkanPhysicalDevice.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
@@ -161,6 +158,12 @@
     </ClInclude>
     <ClInclude Include="src\Rendering\GlfwManager.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseRenderer.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\VulkanRenderer.h">
+      <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -230,9 +233,6 @@
     <ClCompile Include="src\Rendering\Vulkan\VulkanLogicalDevice.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\Vulkan\VulkanManager.cpp">
-      <Filter>Fichiers sources\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\Rendering\Vulkan\VulkanPhysicalDevice.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
@@ -268,6 +268,12 @@
     </ClCompile>
     <ClCompile Include="src\Rendering\GlfwManager.cpp">
       <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BaseRenderer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\VulkanRenderer.cpp">
+      <Filter>Fichiers sources\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

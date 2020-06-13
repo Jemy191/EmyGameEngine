@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include "Helper/Log.h"
-#include "VulkanManager.h"
+#include "VulkanRenderer.h"
 
 VulkanSwapChain::VulkanSwapChain(GLFWwindow* window)
 {

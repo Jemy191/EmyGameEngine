@@ -2,7 +2,7 @@
 
 #include "Helper/Log.h"
 #include "Rendering/Vulkan/VulkanHelper.h"
-#include "VulkanManager.h"
+#include "VulkanRenderer.h"
 
 void VulkanGraphicPipeline::Create(VkPolygonMode polygonMode)
 {
