@@ -3,7 +3,7 @@
 
 SceneModel::~SceneModel()
 {
-	VulkanManager::GetInstance()->MarkModelToBeRemove(model.get());
+	VulkanRenderer::GetInstance()->MarkModelToBeRemove(model.get());
 }
 
 nlohmann::json SceneModel::Save()
@@ -48,9 +48,9 @@ void SceneModel::GUI()
 	if (ImGui::Button(buttonText.c_str()))
 	{
 		if (model != nullptr)
-			VulkanManager::GetInstance()->MarkModelToBeRemove(model.get());
+			VulkanRenderer::GetInstance()->MarkModelToBeRemove(model.get());
 
-		model.reset(VulkanManager::GetInstance()->BasicLoadModel(std::string(meshToLoadInput), std::string(textureToLoadInput), glm::vec3(0), glm::vec3(0), glm::vec3(1)));
+		model.reset(VulkanRenderer::GetInstance()->BasicLoadModel(std::string(meshToLoadInput), std::string(textureToLoadInput), glm::vec3(0), glm::vec3(0), glm::vec3(1)));
 	}
 }
 
@@ -59,5 +59,5 @@ void SceneModel::Load(nlohmann::json sceneModel)
 	SceneObject::Load(sceneModel);
 
 	if (sceneModel["Model"]["ModelSaved"])
-		model.reset(VulkanManager::GetInstance()->BasicLoadModel(sceneModel["Model"]["Mesh"], sceneModel["Model"]["Texture"], transform.position, transform.rotation, transform.scale));
+		model.reset(VulkanRenderer::GetInstance()->BasicLoadModel(sceneModel["Model"]["Mesh"], sceneModel["Model"]["Texture"], transform.position, transform.rotation, transform.scale));
 }

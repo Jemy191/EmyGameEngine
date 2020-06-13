@@ -23,7 +23,7 @@
 #include "Rendering/Model.h"
 #include "Game/ImguiStuff.h"
 
-class VulkanManager
+class VulkanRenderer
 {
 public:
 	static const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -36,7 +36,7 @@ public:
 	glm::vec3 lightColor = glm::vec3(1);
 
 private:
-	static VulkanManager* instance;
+	static VulkanRenderer* instance;
 
 	GLFWwindow* window;
 
@@ -83,8 +83,8 @@ private:
 	std::vector<Model*> modelToBeRemove;
 
 public:
-	VulkanManager(GLFWwindow* window, VkSampleCountFlagBits msaaSamples);
-	~VulkanManager();
+	VulkanRenderer(GLFWwindow* window, VkSampleCountFlagBits msaaSamples);
+	~VulkanRenderer();
 
 	//void RecreateSwapChain();
 
@@ -106,7 +106,7 @@ public:
 	ImguiStuff* GetImguiStuff() const;
 	void WaitForIdle();
 
-	static VulkanManager* GetInstance();
+	static VulkanRenderer* GetInstance();
 
 private:
 	void RemoveModelFromList(Model* model);

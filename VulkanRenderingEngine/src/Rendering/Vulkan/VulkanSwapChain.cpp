@@ -10,12 +10,12 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window)
 {
 	Logger::Log("Creating swapChain");
 
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
-	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
-	VkSurfaceKHR surface = VulkanManager::GetInstance()->GetVkSurfaceKHR();
-	VkSampleCountFlagBits msaaSample = VulkanManager::GetInstance()->GetPhysicalDevice()->GetMsaaSample();
-	VkQueue graphicQueue = VulkanManager::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
-	VkRenderPass renderPass = VulkanManager::GetInstance()->GetRenderPass()->GetVk();
+	VkDevice device = VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk();
+	VkPhysicalDevice physicalDevice = VulkanRenderer::GetInstance()->GetPhysicalDevice()->GetVk();
+	VkSurfaceKHR surface = VulkanRenderer::GetInstance()->GetVkSurfaceKHR();
+	VkSampleCountFlagBits msaaSample = VulkanRenderer::GetInstance()->GetPhysicalDevice()->GetMsaaSample();
+	VkQueue graphicQueue = VulkanRenderer::GetInstance()->GetLogicalDevice()->GetGraphicsQueue();
+	VkRenderPass renderPass = VulkanRenderer::GetInstance()->GetRenderPass()->GetVk();
 
 	VulkanHelper::SwapChainSupportDetails swapChainSupport = VulkanHelper::QuerySwapChainSupport();
 
@@ -135,7 +135,7 @@ VulkanSwapChain::VulkanSwapChain(GLFWwindow* window)
 
 VulkanSwapChain::~VulkanSwapChain()
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
+	VkDevice device = VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk();
 	vkDestroyImageView(device, colorImageView, nullptr);
 	vkDestroyImage(device, colorImage, nullptr);
 	vkFreeMemory(device, colorImageMemory, nullptr);

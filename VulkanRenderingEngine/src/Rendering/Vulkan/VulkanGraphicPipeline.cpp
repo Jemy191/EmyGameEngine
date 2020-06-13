@@ -6,10 +6,10 @@
 
 void VulkanGraphicPipeline::Create(VkPolygonMode polygonMode)
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
-	VkExtent2D swapChainExtent = VulkanManager::GetInstance()->GetSwapChain()->GetVkExtent2D();
-	VkRenderPass renderPass = VulkanManager::GetInstance()->GetRenderPass()->GetVk();
-	VkSampleCountFlagBits msaaSamples = VulkanManager::GetInstance()->GetPhysicalDevice()->GetMsaaSample();
+	VkDevice device = VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk();
+	VkExtent2D swapChainExtent = VulkanRenderer::GetInstance()->GetSwapChain()->GetVkExtent2D();
+	VkRenderPass renderPass = VulkanRenderer::GetInstance()->GetRenderPass()->GetVk();
+	VkSampleCountFlagBits msaaSamples = VulkanRenderer::GetInstance()->GetPhysicalDevice()->GetMsaaSample();
 
 	layoutBinding.AddLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);// Uniform binding for matrix
 	layoutBinding.AddLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);// Sampler for texture
@@ -129,8 +129,8 @@ void VulkanGraphicPipeline::Create(VkPolygonMode polygonMode)
 
 VulkanGraphicPipeline::~VulkanGraphicPipeline()
 {
-	vkDestroyPipeline(VulkanManager::GetInstance()->GetLogicalDevice()->GetVk(), graphicsPipeline, nullptr);
-	vkDestroyPipelineLayout(VulkanManager::GetInstance()->GetLogicalDevice()->GetVk(), pipelineLayout, nullptr);
+	vkDestroyPipeline(VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk(), graphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk(), pipelineLayout, nullptr);
 
 	Logger::Log("Graphic pipeline destroyed");
 }

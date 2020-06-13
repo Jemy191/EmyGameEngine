@@ -28,7 +28,7 @@ bool settingWindowOpen = false;
 bool hierarchyWindowOpen = true;
 bool statWindowOpen = false;
 
-void GUI(VulkanManager* vulkanManager)
+void GUI(VulkanRenderer* vulkanManager)
 {
 	if (demoWindowOpen)
 	{
@@ -134,7 +134,7 @@ int WinMain()
 		AssetManager::Init();
 
 		GlfwManager glfwManager = GlfwManager(1600, 900, "TestGame");
-		VulkanManager vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
+		VulkanRenderer vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
 
 		double mousePosX, mousePosY;
 		glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);

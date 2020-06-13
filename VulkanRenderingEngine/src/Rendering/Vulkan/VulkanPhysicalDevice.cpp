@@ -14,7 +14,7 @@ const std::vector<const char*> VulkanPhysicalDevice::DEVICE_EXTENSIONS =
 VulkanPhysicalDevice::VulkanPhysicalDevice(VkSampleCountFlagBits msaaSamples)
 {
 	Logger::Log("Creating physicalDevice");
-	VkInstance instance = VulkanManager::GetInstance()->GetVulkanInstance()->GetVk();
+	VkInstance instance = VulkanRenderer::GetInstance()->GetVulkanInstance()->GetVk();
 
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);

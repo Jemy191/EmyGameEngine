@@ -10,12 +10,12 @@
 #include <chrono>
 #include <algorithm>
 
-VulkanManager* VulkanManager::instance = nullptr;
+VulkanRenderer* VulkanRenderer::instance = nullptr;
 
-VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggestedMsaaSamples)
+VulkanRenderer::VulkanRenderer(GLFWwindow* window, VkSampleCountFlagBits suggestedMsaaSamples)
 {
 	if (instance != nullptr)
-		Logger::Log(LogSeverity::FATAL_ERROR, "There cant be 2 VulkanManager");
+		Logger::Log(LogSeverity::FATAL_ERROR, "There cant be 2 VulkanRenderer");
 
 	instance = this;
 	this->window = window;
@@ -94,7 +94,7 @@ VulkanManager::VulkanManager(GLFWwindow* window, VkSampleCountFlagBits suggested
 	Logger::Log("Vulkan created");
 }
 
-VulkanManager::~VulkanManager()
+VulkanRenderer::~VulkanRenderer()
 {
 	skyboxMesh.reset();
 	swapChain.reset();
@@ -136,7 +136,7 @@ VulkanManager::~VulkanManager()
 	Logger::Log("Vulkan destroyed");
 }
 
-/*void VulkanManager::RecreateSwapChain()
+/*void VulkanRenderer::RecreateSwapChain()
 {
 	int width = 0, height = 0;
 	while (width == 0 || height == 0)
@@ -189,7 +189,7 @@ VulkanManager::~VulkanManager()
 	CreateCommandBuffer();
 }*/
 
-void VulkanManager::Draw()
+void VulkanRenderer::Draw()
 {
 	for (size_t i = 0; i < commandBuffers.size(); i++)
 	{
@@ -260,7 +260,7 @@ void VulkanManager::Draw()
 	}
 }
 
-void VulkanManager::Present(GlfwManager* window)
+void VulkanRenderer::Present(GlfwManager* window)
 {
 	// Remove model from model list
 	if (modelToBeRemove.size() != 0)
@@ -343,7 +343,7 @@ void VulkanManager::Present(GlfwManager* window)
 	vkQueueWaitIdle(logicalDevice->GetPresentQueue());
 }
 
-Model* VulkanManager::BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+Model* VulkanRenderer::BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
 	Mesh* newMesh = new Mesh(meshName + ".obj", Mesh::MeshFormat::OBJ);
 	meshList.push_back(newMesh);
@@ -364,12 +364,12 @@ Model* VulkanManager::BasicLoadModel(std::string meshName, std::string textureNa
 	return testModel;
 }
 
-void VulkanManager::MarkModelToBeRemove(Model* model)
+void VulkanRenderer::MarkModelToBeRemove(Model* model)
 {
 	modelToBeRemove.push_back(model);
 }
 
-void VulkanManager::AddModelToList(Model* model)
+void VulkanRenderer::AddModelToList(Model* model)
 {
 	using namespace std;
 	if (modelList.count(model->graphicPipeline) == 0)
@@ -389,7 +389,7 @@ void VulkanManager::AddModelToList(Model* model)
 	modelList[model->graphicPipeline][model->mesh].push_back(unique_ptr<Model>(model));
 }
 
-void VulkanManager::RemoveModelFromList(Model* model)
+void VulkanRenderer::RemoveModelFromList(Model* model)
 {
 	for (size_t i = 0; i < modelList[model->graphicPipeline][model->mesh].size(); i++)
 	{
@@ -407,57 +407,57 @@ void VulkanManager::RemoveModelFromList(Model* model)
 		modelList.erase(model->graphicPipeline);
 }
 
-VulkanInstance* VulkanManager::GetVulkanInstance() const
+VulkanInstance* VulkanRenderer::GetVulkanInstance() const
 {
 	return vulkanInstance.get();
 }
 
-VkSurfaceKHR VulkanManager::GetVkSurfaceKHR() const
+VkSurfaceKHR VulkanRenderer::GetVkSurfaceKHR() const
 {
 	return surface;
 }
 
-VulkanPhysicalDevice* VulkanManager::GetPhysicalDevice() const
+VulkanPhysicalDevice* VulkanRenderer::GetPhysicalDevice() const
 {
 	return physicalDevice.get();
 }
 
-VulkanLogicalDevice* VulkanManager::GetLogicalDevice() const
+VulkanLogicalDevice* VulkanRenderer::GetLogicalDevice() const
 {
 	return logicalDevice.get();
 }
 
-VulkanSwapChain* VulkanManager::GetSwapChain() const
+VulkanSwapChain* VulkanRenderer::GetSwapChain() const
 {
 	return swapChain.get();
 }
 
-VulkanRenderPass* VulkanManager::GetRenderPass() const
+VulkanRenderPass* VulkanRenderer::GetRenderPass() const
 {
 	return renderPass.get();
 }
 
-VkCommandPool VulkanManager::GetGlobalCommandPool() const
+VkCommandPool VulkanRenderer::GetGlobalCommandPool() const
 {
 	return globalCommandPool;
 }
 
-ImguiStuff* VulkanManager::GetImguiStuff() const
+ImguiStuff* VulkanRenderer::GetImguiStuff() const
 {
 	return imguiStuff.get();
 }
 
-void VulkanManager::WaitForIdle()
+void VulkanRenderer::WaitForIdle()
 {
 	vkDeviceWaitIdle(logicalDevice->GetVk());
 }
 
-VulkanManager* VulkanManager::GetInstance()
+VulkanRenderer* VulkanRenderer::GetInstance()
 {
 	return instance;
 }
 
-void VulkanManager::CreateCommandBuffer()
+void VulkanRenderer::CreateCommandBuffer()
 {
 	commandBuffers.resize(swapChain->GetSwapChainFramebuffers().size());
 
@@ -476,7 +476,7 @@ void VulkanManager::CreateCommandBuffer()
 	}
 }
 
-void VulkanManager::CreateSyncObject()
+void VulkanRenderer::CreateSyncObject()
 {
 	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -500,7 +500,7 @@ void VulkanManager::CreateSyncObject()
 	}
 }
 
-void VulkanManager::UpdateUniformBuffer(uint32_t currentImage)
+void VulkanRenderer::UpdateUniformBuffer(uint32_t currentImage)
 {
 	static auto startTime = std::chrono::high_resolution_clock::now();
 

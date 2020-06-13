@@ -12,7 +12,7 @@
 VulkanLogicalDevice::VulkanLogicalDevice()
 {
 	Logger::Log("Creating logicalDevice");
-	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
+	VkPhysicalDevice physicalDevice = VulkanRenderer::GetInstance()->GetPhysicalDevice()->GetVk();
 
 	VulkanHelper::QueueFamilyIndices indices = VulkanHelper::FindQueueFamilies();
 

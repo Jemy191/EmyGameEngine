@@ -22,7 +22,7 @@ void Model::Draw(VkCommandBuffer commandBuffer, int i)
 
 void Model::UpdateUniformBuffer(uint32_t currentImage, VulkanHelper::UniformBufferObject* ubo)
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
+	VkDevice device = VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk();
 
 	void* data;
 	vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(*ubo), 0, &data);
@@ -38,9 +38,9 @@ void Model::Recreate()
 
 void Model::Create()
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
-	VkPhysicalDevice physicalDevice = VulkanManager::GetInstance()->GetPhysicalDevice()->GetVk();
-	size_t swapchainImagesSize = VulkanManager::GetInstance()->GetSwapChain()->GetVkImages().size();
+	VkDevice device = VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk();
+	VkPhysicalDevice physicalDevice = VulkanRenderer::GetInstance()->GetPhysicalDevice()->GetVk();
+	size_t swapchainImagesSize = VulkanRenderer::GetInstance()->GetSwapChain()->GetVkImages().size();
 
 	// Uniform buffer
 	VkDeviceSize bufferSize = sizeof(VulkanHelper::UniformBufferObject);
@@ -59,7 +59,7 @@ void Model::Create()
 
 void Model::Cleanup()
 {
-	VkDevice device = VulkanManager::GetInstance()->GetLogicalDevice()->GetVk();
+	VkDevice device = VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk();
 	for (size_t i = 0; i < uniformBuffers.size(); i++)
 	{
 		vkDestroyBuffer(device, uniformBuffers[i], nullptr);
