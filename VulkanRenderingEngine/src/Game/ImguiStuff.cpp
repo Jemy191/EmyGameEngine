@@ -65,6 +65,7 @@ ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily)
 	init_info.PipelineCache = g_PipelineCache;
 	init_info.DescriptorPool = g_DescriptorPool;
 	init_info.Allocator = nullptr;
+	init_info.MSAASamples = VulkanManager::GetInstance()->GetPhysicalDevice()->GetMsaaSample();
 	init_info.MinImageCount = VulkanHelper::QuerySwapChainSupport().capabilities.minImageCount + 1;;
 	init_info.ImageCount = VulkanManager::GetInstance()->GetSwapChain()->GetVkImages().size();
 	init_info.CheckVkResultFn = nullptr;

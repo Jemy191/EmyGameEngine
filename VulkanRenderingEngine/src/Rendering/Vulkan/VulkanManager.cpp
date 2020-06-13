@@ -465,7 +465,7 @@ void VulkanManager::CreateCommandBuffer()
 	{
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		allocInfo.globalCommandPool = drawCommandPool[i];
+		allocInfo.commandPool = drawCommandPool[i];
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocInfo.commandBufferCount = 1;
 
