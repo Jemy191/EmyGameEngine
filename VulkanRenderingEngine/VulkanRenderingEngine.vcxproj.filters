@@ -159,9 +159,6 @@
     <ClInclude Include="src\Rendering\GlfwManager.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\BaseRenderer.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="src\Rendering\Vulkan\VulkanRenderer.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
@@ -267,9 +264,6 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="src\Rendering\GlfwManager.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BaseRenderer.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="src\Rendering\Vulkan\VulkanRenderer.cpp">

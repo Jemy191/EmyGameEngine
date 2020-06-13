@@ -128,7 +128,6 @@
   <ItemGroup>
     <ClInclude Include="src\Asset\Asset.h" />
     <ClInclude Include="src\Asset\AssetManager.h" />
-    <ClInclude Include="src\BaseRenderer.h" />
     <ClInclude Include="src\Helper\FPSCounter.h" />
     <ClInclude Include="src\Rendering\GlfwManager.h" />
     <ClInclude Include="src\Game\ImguiStuff.h" />
@@ -168,7 +167,6 @@
   <ItemGroup>
     <ClCompile Include="src\Asset\Asset.cpp" />
     <ClCompile Include="src\Asset\AssetManager.cpp" />
-    <ClCompile Include="src\BaseRenderer.cpp" />
     <ClCompile Include="src\Helper\FPSCounter.cpp" />
     <ClCompile Include="src\Rendering\GlfwManager.cpp" />
     <ClCompile Include="src\Game\ImguiStuff.cpp" />
