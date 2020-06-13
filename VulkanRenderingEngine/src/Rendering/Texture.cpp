@@ -7,7 +7,7 @@
 #include <cmath>
 #include <algorithm>
 #include "Helper/Log.h"
-#include "Rendering/Vulkan/VulkanManager.h"
+#include "Rendering/Vulkan/VulkanRenderer.h"
 
 #include "Rendering/Vulkan/VulkanHelper.h"
 

@@ -2,7 +2,7 @@
 #include <sstream>
 
 #include <Rendering/GlfwManager.h>
-#include <Rendering/Vulkan/VulkanManager.h>
+#include <Rendering/Vulkan/VulkanRenderer.h>
 #include <Helper/FPSCounter.h>
 #include <glm/gtx/rotate_vector.hpp>
 #include <json.hpp>

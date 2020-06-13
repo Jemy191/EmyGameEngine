@@ -1,5 +1,5 @@
 #include "Scene/SceneModel.h"
-#include "Rendering/Vulkan/VulkanManager.h"
+#include "Rendering/Vulkan/VulkanRenderer.h"
 
 SceneModel::~SceneModel()
 {

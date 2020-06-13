@@ -2,7 +2,7 @@
 
 #include "Rendering/Vulkan/VulkanHelper.h"
 #include "Helper/Log.h"
-#include "Rendering/Vulkan/VulkanManager.h"
+#include "Rendering/Vulkan/VulkanRenderer.h"
 
 ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily)
 {

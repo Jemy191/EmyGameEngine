@@ -1,6 +1,6 @@
 #include "Rendering/Model.h"
 #include "Helper/Log.h"
-#include "Rendering/Vulkan/VulkanManager.h"
+#include "Rendering/Vulkan/VulkanRenderer.h"
 
 Model::Model(Mesh* mesh, Texture* texture, Texture* normalTexture, VulkanGraphicPipeline* graphicPipeline)
 	: mesh(mesh), texture(texture), normalTexture(normalTexture), graphicPipeline(graphicPipeline)

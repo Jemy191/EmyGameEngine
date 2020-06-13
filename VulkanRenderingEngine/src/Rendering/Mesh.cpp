@@ -11,7 +11,7 @@
 
 #include <unordered_map>
 #include <array>
-#include "Rendering/Vulkan/VulkanManager.h"
+#include "Rendering/Vulkan/VulkanRenderer.h"
 
 const std::string Mesh::PATH = "Assets/Meshs/";
 
