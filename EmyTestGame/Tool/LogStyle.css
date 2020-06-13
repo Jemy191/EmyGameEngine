@@ -1,0 +1,16 @@
+.Message
+{
+    color: skyblue;
+}
+.Warning
+{
+    color: yellow;
+}
+.Error
+{
+    color: orange;
+}
+.Fatal_Error
+{
+    color: red;
+}
