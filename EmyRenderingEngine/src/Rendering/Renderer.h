@@ -1,6 +1,10 @@
 #pragma once
 #include "Game/Setting.h"
 #include <json.hpp>
+#include <memory>
+#include "Header/GLFWHeader.h"
+#include "Rendering/UI/ImguiBase.h"
+#include <Rendering\GlfwManager.h>
 
 enum class GraphicalAPI : int
 {
@@ -10,7 +14,8 @@ enum class GraphicalAPI : int
 	DIRECTX12 = 3
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(GraphicalAPI, {
+NLOHMANN_JSON_SERIALIZE_ENUM(GraphicalAPI,
+	{
 	{GraphicalAPI::OPENGL, "OPENGL"},
 	{GraphicalAPI::VULKAN, "VULKAN"},
 	{GraphicalAPI::METAL, "METAL"},
@@ -20,6 +25,17 @@ NLOHMANN_JSON_SERIALIZE_ENUM(GraphicalAPI, {
 
 class Renderer
 {
+protected:
+	std::unique_ptr<ImguiBase> imgui;
+
 public:
-	static bool IsGraphicalAPI(GraphicalAPI api) { return Setting::Get("GraphicAPI", GraphicalAPI::OPENGL) == api; }
+	static bool IsGraphicalAPI(GraphicalAPI api);
+	static std::unique_ptr<Renderer> CreateGraphicalAPI(GraphicalAPI api, GLFWwindow* window);
+
+	Renderer(GLFWwindow* window);
+
+	virtual void Present(GlfwManager* window) {};
+	virtual void WaitForIdle() {}
+
+	ImguiBase* GetImgui() const;
 };
