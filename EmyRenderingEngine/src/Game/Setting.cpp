@@ -10,8 +10,11 @@ void Setting::Add(std::string name, nlohmann::json input)
 
 nlohmann::json Setting::Get(std::string name, nlohmann::json defaultSetting)
 {
-	if (data.empty())
+	if (!data.contains(name))
+	{
+		Add(name, defaultSetting);
 		return defaultSetting;
+	}
 
 	return data[name];
 }
