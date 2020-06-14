@@ -1,19 +1,17 @@
 #pragma once
 #include "Header/GLFWHeader.h"
 
-#include "Imgui/imgui.h"
-#include "Imgui/imgui_stdlib.h"
-#include "Imgui/imgui_impl_glfw.h"
+#include "Header/ImguiHeader.h"
 #include "Imgui/imgui_impl_vulkan.h"
+#include "Rendering/UI/ImguiBase.h"
 
-class ImguiStuff
+class ImguiVulkan : public ImguiBase
 {
 public:
-	ImguiStuff(GLFWwindow* window, uint32_t queueFamily);
-	~ImguiStuff();
+	ImguiVulkan(GLFWwindow* window, uint32_t queueFamily);
+	~ImguiVulkan();
 
-	void StartFrame();
-	void EndFrame();
+	void StartFrame() override;
 
 	void Draw(VkCommandBuffer commandBuffer);
 

@@ -1,12 +1,12 @@
-#include "Game/ImguiStuff.h"
+#include "ImguiVulkan.h"
 
 #include "Rendering/Vulkan/VulkanHelper.h"
 #include "Helper/Log.h"
 #include "Rendering/Vulkan/VulkanRenderer.h"
 
-ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily)
+ImguiVulkan::ImguiVulkan(GLFWwindow* window, uint32_t queueFamily)
 {
-	Logger::Log("Creating imgui");
+	Logger::Log("Creating imgui for vulkan");
 	VkInstance instance = VulkanRenderer::GetInstance()->GetVulkanInstance()->GetVk();
 	VkDevice device = VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk();
 	VkPhysicalDevice physicalDevice = VulkanRenderer::GetInstance()->GetPhysicalDevice()->GetVk();
@@ -92,7 +92,7 @@ ImguiStuff::ImguiStuff(GLFWwindow* window, uint32_t queueFamily)
 	}
 }
 
-ImguiStuff::~ImguiStuff()
+ImguiVulkan::~ImguiVulkan()
 {
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -100,19 +100,14 @@ ImguiStuff::~ImguiStuff()
 	vkDestroyDescriptorPool(VulkanRenderer::GetInstance()->GetLogicalDevice()->GetVk(), g_DescriptorPool, nullptr);
 }
 
-void ImguiStuff::StartFrame()
+void ImguiVulkan::StartFrame()
 {
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 }
 
-void ImguiStuff::EndFrame()
-{
-	ImGui::Render(); // Also endFrame. Do not draw. Just setup draw data.
-}
-
-void ImguiStuff::Draw(VkCommandBuffer commandBuffer)
+void ImguiVulkan::Draw(VkCommandBuffer commandBuffer)
 {
 	// Record Imgui Draw Data and draw funcs into command buffer
 	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);

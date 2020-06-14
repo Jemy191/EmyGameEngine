@@ -150,9 +150,6 @@
     <ClInclude Include="src\Game\Transform.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\ImguiStuff.h">
-      <Filter>Fichiers d%27en-tête\Imgui</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Setting.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -169,6 +166,24 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\OpenGL\OpenGLRenderer.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helper\Exeption.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Vulkan\ImguiVulkan.h">
+      <Filter>Fichiers d%27en-tête\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\UI\ImguiBase.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Header\ImguiHeader.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGL\ImguiOpenGL.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Imgui\imgui_impl_opengl3.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
@@ -263,9 +278,6 @@
     <ClCompile Include="src\Helper\Timer.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\ImguiStuff.cpp">
-      <Filter>Fichiers sources\Imgui</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\Setting.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -282,6 +294,21 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="src\Rendering\OpenGL\OpenGLRenderer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helper\Exeption.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Vulkan\ImguiVulkan.cpp">
+      <Filter>Fichiers sources\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\UI\ImguiBase.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGL\ImguiOpenGL.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Imgui\imgui_impl_opengl3.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>

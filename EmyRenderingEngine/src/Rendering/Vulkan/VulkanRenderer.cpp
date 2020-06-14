@@ -9,10 +9,11 @@
 
 #include <chrono>
 #include <algorithm>
+#include <Rendering\Vulkan\ImguiVulkan.h>
 
 VulkanRenderer* VulkanRenderer::instance = nullptr;
 
-VulkanRenderer::VulkanRenderer(GLFWwindow* window, VkSampleCountFlagBits suggestedMsaaSamples)
+VulkanRenderer::VulkanRenderer(GLFWwindow* window) : Renderer(window)
 {
 	if (instance != nullptr)
 		Logger::Log(LogSeverity::FATAL_ERROR, "There cant be 2 VulkanRenderer");
@@ -30,7 +31,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, VkSampleCountFlagBits suggest
 		Logger::Log(LogSeverity::FATAL_ERROR, "failed to create window surface!");
 	}
 
-	physicalDevice = std::unique_ptr<VulkanPhysicalDevice>(new VulkanPhysicalDevice(suggestedMsaaSamples));
+	physicalDevice = std::unique_ptr<VulkanPhysicalDevice>(new VulkanPhysicalDevice(VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT));
 	logicalDevice = std::unique_ptr<VulkanLogicalDevice>(new VulkanLogicalDevice());
 
 	Logger::Log("Creating globalCommandPool");
@@ -56,7 +57,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, VkSampleCountFlagBits suggest
 		}
 	}
 
-	imguiStuff = std::unique_ptr<ImguiStuff>(new ImguiStuff(window, queueFamilyIndices.graphicsFamily.value()));
+	imgui = std::unique_ptr<ImguiVulkan>(new ImguiVulkan(window, queueFamilyIndices.graphicsFamily.value()));
 
 	Logger::Log("Creating test shader");
 	// TestMesh and shader
@@ -249,7 +250,7 @@ void VulkanRenderer::Draw()
 			graphicPipelineIterator++;
 		}
 
-		imguiStuff->Draw(commandBuffers[i]);
+		dynamic_cast<ImguiVulkan*>(imgui.get())->Draw(commandBuffers[i]);
 
 		vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -440,11 +441,6 @@ VulkanRenderPass* VulkanRenderer::GetRenderPass() const
 VkCommandPool VulkanRenderer::GetGlobalCommandPool() const
 {
 	return globalCommandPool;
-}
-
-ImguiStuff* VulkanRenderer::GetImguiStuff() const
-{
-	return imguiStuff.get();
 }
 
 void VulkanRenderer::WaitForIdle()

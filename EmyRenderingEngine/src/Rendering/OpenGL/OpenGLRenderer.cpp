@@ -1,6 +1,12 @@
 #include "OpenGLRenderer.h"
+#include <Rendering\OpenGL\ImguiOpenGL.h>
 
-void OpenGLRenderer::RenderTest(GLFWwindow* window)
+OpenGLRenderer::OpenGLRenderer(GLFWwindow* window) : Renderer(window)
+{
+	imgui = std::unique_ptr<ImguiOpenGL>(new ImguiOpenGL(window));
+}
+
+void OpenGLRenderer::Present(GlfwManager* window)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -12,5 +18,7 @@ void OpenGLRenderer::RenderTest(GLFWwindow* window)
 
 	glEnd();
 
-	glfwSwapBuffers(window);
+	dynamic_cast<ImguiOpenGL*>(imgui.get())->Draw();
+
+	glfwSwapBuffers(window->GetWindow());
 }

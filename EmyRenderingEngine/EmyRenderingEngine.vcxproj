@@ -127,6 +127,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\Rendering\OpenGL\ImguiOpenGL.h" />
+    <ClInclude Include="src\Header\ImguiHeader.h" />
+    <ClInclude Include="src\Rendering\UI\ImguiBase.h" />
+    <ClInclude Include="src\Helper\Exeption.h" />
     <ClInclude Include="src\Rendering\OpenGL\OpenGLRenderer.h" />
     <ClInclude Include="src\Header\GLFWHeader.h" />
     <ClInclude Include="src\Rendering\Renderer.h" />
@@ -134,7 +139,7 @@
     <ClInclude Include="src\Asset\AssetManager.h" />
     <ClInclude Include="src\Helper\FPSCounter.h" />
     <ClInclude Include="src\Rendering\GlfwManager.h" />
-    <ClInclude Include="src\Game\ImguiStuff.h" />
+    <ClInclude Include="src\Rendering\Vulkan\ImguiVulkan.h" />
     <ClInclude Include="src\Imgui\imconfig.h" />
     <ClInclude Include="src\Imgui\imgui.h" />
     <ClInclude Include="src\Imgui\imgui_impl_glfw.h" />
@@ -169,13 +174,17 @@
     <ClInclude Include="src\Rendering\Vulkan\VulkanSwapChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\Rendering\OpenGL\ImguiOpenGL.cpp" />
+    <ClCompile Include="src\Rendering\UI\ImguiBase.cpp" />
+    <ClCompile Include="src\Helper\Exeption.cpp" />
     <ClCompile Include="src\Rendering\OpenGL\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Rendering\Renderer.cpp" />
     <ClCompile Include="src\Asset\Asset.cpp" />
     <ClCompile Include="src\Asset\AssetManager.cpp" />
     <ClCompile Include="src\Helper\FPSCounter.cpp" />
     <ClCompile Include="src\Rendering\GlfwManager.cpp" />
-    <ClCompile Include="src\Game\ImguiStuff.cpp" />
+    <ClCompile Include="src\Rendering\Vulkan\ImguiVulkan.cpp" />
     <ClCompile Include="src\Imgui\imgui.cpp" />
     <ClCompile Include="src\Imgui\imgui_demo.cpp" />
     <ClCompile Include="src\Imgui\imgui_draw.cpp" />

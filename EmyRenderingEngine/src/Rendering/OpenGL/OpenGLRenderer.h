@@ -1,9 +1,11 @@
 #pragma once
 #include "Rendering/Renderer.h"
-#include "Header/GLFWHeader.h"
+#include <Rendering\GlfwManager.h>
 
-class OpenGLRenderer// : public Renderer
+class OpenGLRenderer : public Renderer
 {
 public:
-    static void RenderTest(GLFWwindow* window);
+    OpenGLRenderer(GLFWwindow* window);
+
+    void Present(GlfwManager* window) override;
 };

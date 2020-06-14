@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <algorithm>
 #include "Helper/Log.h"
-#include "Game/ImguiStuff.h"
+#include "Rendering/UI/ImguiBase.h"
 #include "SceneModel.h"
 
 Scene* Scene::currentScene = nullptr;

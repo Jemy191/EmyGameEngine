@@ -20,10 +20,10 @@
 #include "Rendering/Vulkan/VulkanDescriptor.h"
 #include "Rendering/GlfwManager.h"
 #include "Rendering/Model.h"
-#include "Game/ImguiStuff.h"
+#include "Rendering/UI/ImguiBase.h"
 #include "Rendering/Renderer.h"
 
-class VulkanRenderer
+class VulkanRenderer : public Renderer
 {
 public:
 	static const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -54,8 +54,6 @@ private:
 	std::unique_ptr <VulkanGraphicPipeline> basicGraphicPipeline;
 	std::unique_ptr <VulkanGraphicPipeline> textureColorGraphicPipeline;
 
-	std::unique_ptr<ImguiStuff> imguiStuff;
-
 	std::map<VulkanGraphicPipeline*, std::map<Mesh*, std::vector<std::unique_ptr<Model>>>> modelList;
 
 	std::unique_ptr<Texture> checkerTexture;
@@ -83,12 +81,12 @@ private:
 	std::vector<Model*> modelToBeRemove;
 
 public:
-	VulkanRenderer(GLFWwindow* window, VkSampleCountFlagBits msaaSamples);
+	VulkanRenderer(GLFWwindow* window);
 	~VulkanRenderer();
 
 	//void RecreateSwapChain();
 
-	void Present(GlfwManager* window);
+	void Present(GlfwManager* window) override;
 
 	Model* BasicLoadModel(std::string meshName, std::string textureName, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
 	void MarkModelToBeRemove(Model* model);
@@ -103,8 +101,7 @@ public:
 	VulkanRenderPass* GetRenderPass() const;
 	VkCommandPool GetGlobalCommandPool() const;
 
-	ImguiStuff* GetImguiStuff() const;
-	void WaitForIdle();
+	void WaitForIdle() override;
 
 	static VulkanRenderer* GetInstance();
 

@@ -12,11 +12,12 @@
 #include <iomanip>
 #include <glm/gtc/type_ptr.hpp>
 #include <Scene/Scene.h>
-#include "Game/ImguiStuff.h"
+#include "Rendering/UI/ImguiBase.h"
 #include "Imgui/imgui_internal.h"
 #include <filesystem>
 #include "Asset/AssetManager.h"
 #include <Game/Setting.h>
+#include <memory>
 
 float camSpeed = 5;
 float lookSpeed = 0.5f;
@@ -30,7 +31,7 @@ bool settingWindowOpen = false;
 bool hierarchyWindowOpen = true;
 bool statWindowOpen = false;
 
-void GUI(VulkanRenderer* vulkanManager)
+void GUI()
 {
 	if (demoWindowOpen)
 	{
@@ -68,10 +69,13 @@ void GUI(VulkanRenderer* vulkanManager)
 			{
 				ImGui::SliderFloat("Cam speed", &camSpeed, 1, 100);
 				ImGui::SliderFloat("Look speed", &lookSpeed, 0.1f, 1);
-				ImGui::SliderFloat3("Light dir", &vulkanManager->lightDir.x, -1, 1);
-				//ImGui::SliderFloat("Light shininess", &vulkanManager->lightSetting.x, 1, 100);
-				//ImGui::SliderFloat("Light spec", &vulkanManager->lightSetting.y, 0.1f, 10);
-				ImGui::ColorEdit3("Light color", &vulkanManager->lightColor.x);
+
+				//ImGui::SliderFloat3("Light dir", &vulkanManager->lightDir.x, -1, 1);
+
+				//ImGui::SliderFloat("Light shininess", &renderer->lightSetting.x, 1, 100);
+				//ImGui::SliderFloat("Light spec", &renderer->lightSetting.y, 0.1f, 10);
+
+				//ImGui::ColorEdit3("Light color", &vulkanManager->lightColor.x);
 			}
 		}
 		ImGui::End();
@@ -137,10 +141,7 @@ int WinMain()
 
 		GlfwManager glfwManager = GlfwManager(1600, 900, "TestGame");
 
-		VulkanRenderer* vulkanManager = nullptr;
-
-		if (Renderer::IsGraphicalAPI(GraphicalAPI::VULKAN))
-			vulkanManager = new VulkanRenderer(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
+		std::unique_ptr<Renderer> renderer = Renderer::CreateGraphicalAPI(Setting::Get("GraphicAPI", GraphicalAPI::OPENGL).get<GraphicalAPI>(), glfwManager.GetWindow());
 
 		double mousePosX, mousePosY;
 		glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
@@ -151,76 +152,70 @@ int WinMain()
 			FPSCounter::StartCounting();
 			glfwPollEvents();
 
-			if (Renderer::IsGraphicalAPI(GraphicalAPI::OPENGL))
-				OpenGLRenderer::RenderTest(glfwManager.GetWindow());
+			//if (!ImGui::GetCurrentContext()->NavWindow)
+			//{
+			//	//cam movement
+			//	glm::vec3 dir = glm::vec3(0);
 
-			if (Renderer::IsGraphicalAPI(GraphicalAPI::VULKAN))
-			{
-				if (!ImGui::GetCurrentContext()->NavWindow)
-				{
-					//cam movement
-					glm::vec3 dir = glm::vec3(0);
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_ESCAPE))
+			//		break;
 
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_ESCAPE))
-						break;
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
+			//		dir.y = 1;
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
+			//		dir.x = -1;
 
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
-						dir.y = 1;
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
-						dir.x = -1;
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
+			//		dir.y = -1;
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
+			//		dir.x = 1;
 
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
-						dir.y = -1;
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
-						dir.x = 1;
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_Q))
+			//		dir.z = -1;
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
+			//		dir.z = 1;
 
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_Q))
-						dir.z = -1;
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
-						dir.z = 1;
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_UP))
+			//		camSpeed += 10 * FPSCounter::GetDeltaTime();
+			//	if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
+			//		camSpeed += -10 * FPSCounter::GetDeltaTime();
 
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_UP))
-						camSpeed += 10 * FPSCounter::GetDeltaTime();
-					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
-						camSpeed += -10 * FPSCounter::GetDeltaTime();
+			//	renderer->camPos += dir.y * renderer->camDir * camSpeed * FPSCounter::GetDeltaTime();
+			//	renderer->camPos += dir.x * glm::cross(renderer->camDir, glm::vec3(0, 0, 1)) * camSpeed * FPSCounter::GetDeltaTime();
+			//	renderer->camPos.z += dir.z * camSpeed * FPSCounter::GetDeltaTime();
 
-					vulkanManager->camPos += dir.y * vulkanManager->camDir * camSpeed * FPSCounter::GetDeltaTime();
-					vulkanManager->camPos += dir.x * glm::cross(vulkanManager->camDir, glm::vec3(0, 0, 1)) * camSpeed * FPSCounter::GetDeltaTime();
-					vulkanManager->camPos.z += dir.z * camSpeed * FPSCounter::GetDeltaTime();
+			//	// cam rotation
+			//	double mousePosX, mousePosY;
+			//	glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
+			//	glm::vec2 mousePos = glm::vec2(mousePosX, mousePosY);
 
-					// cam rotation
-					double mousePosX, mousePosY;
-					glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
-					glm::vec2 mousePos = glm::vec2(mousePosX, mousePosY);
+			//	glm::vec2 mouseDelta = lastMousePos - mousePos;
 
-					glm::vec2 mouseDelta = lastMousePos - mousePos;
+			//	glm::vec3 rot(0);
+			//	if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
+			//	{
+			//		renderer->camDir = glm::rotate(renderer->camDir, mouseDelta.x * lookSpeed * FPSCounter::GetDeltaTime(), glm::vec3(0, 0, 1));
+			//		renderer->camDir = glm::rotate(renderer->camDir, mouseDelta.y * lookSpeed * FPSCounter::GetDeltaTime(), glm::cross(renderer->camDir, glm::vec3(0, 0, 1)));
+			//	}
 
-					glm::vec3 rot(0);
-					if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
-					{
-						vulkanManager->camDir = glm::rotate(vulkanManager->camDir, mouseDelta.x * lookSpeed * FPSCounter::GetDeltaTime(), glm::vec3(0, 0, 1));
-						vulkanManager->camDir = glm::rotate(vulkanManager->camDir, mouseDelta.y * lookSpeed * FPSCounter::GetDeltaTime(), glm::cross(vulkanManager->camDir, glm::vec3(0, 0, 1)));
-					}
+			//	lastMousePos = mousePos;
+			//}
 
-					lastMousePos = mousePos;
-				}
+			renderer->GetImgui()->StartFrame();
 
-				vulkanManager->GetImguiStuff()->StartFrame();
+			if (Scene::GetCurrentScene() != nullptr)
+				Scene::GetCurrentScene()->Update();
 
-				if (Scene::GetCurrentScene() != nullptr)
-					Scene::GetCurrentScene()->Update();
+			GUI();
 
-				GUI(vulkanManager);
+			renderer->GetImgui()->EndFrame();
 
-				vulkanManager->GetImguiStuff()->EndFrame();
+			renderer->Present(&glfwManager);
 
-				vulkanManager->Present(&glfwManager);
-			}
 			FPSCounter::StopCounting();
 		}
 
-		if (Renderer::IsGraphicalAPI(GraphicalAPI::VULKAN))
-			vulkanManager->WaitForIdle();
+		renderer->WaitForIdle();
 
 		Setting::Save();
 	}

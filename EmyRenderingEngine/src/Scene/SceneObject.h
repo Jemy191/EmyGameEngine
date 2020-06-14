@@ -6,7 +6,7 @@
 #include <optional>
 #include <json.hpp>
 #include "Helper/Log.h"
-#include "Game/ImguiStuff.h"
+#include "Rendering/UI/ImguiBase.h"
 
 class SceneObject
 {
