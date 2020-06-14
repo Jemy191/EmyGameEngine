@@ -3,6 +3,8 @@
 
 #include <Rendering/GlfwManager.h>
 #include <Rendering/Vulkan/VulkanRenderer.h>
+#include <Rendering/OpenGL/OpenGLRenderer.h>  
+
 #include <Helper/FPSCounter.h>
 #include <glm/gtx/rotate_vector.hpp>
 #include <json.hpp>
@@ -126,7 +128,7 @@ int main()
 #else
 int WinMain()
 #endif
-{ 
+{
 	try
 	{
 		Logger::Open();
@@ -134,7 +136,11 @@ int WinMain()
 		AssetManager::Init();
 
 		GlfwManager glfwManager = GlfwManager(1600, 900, "TestGame");
-		VulkanRenderer vulkanManager(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
+
+		VulkanRenderer* vulkanManager = nullptr;
+
+		if (Renderer::IsGraphicalAPI(GraphicalAPI::VULKAN))
+			vulkanManager = new VulkanRenderer(glfwManager.GetWindow(), VkSampleCountFlagBits::VK_SAMPLE_COUNT_8_BIT);
 
 		double mousePosX, mousePosY;
 		glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
@@ -142,72 +148,79 @@ int WinMain()
 
 		while (!glfwWindowShouldClose(glfwManager.GetWindow()))
 		{
-			glfwPollEvents();
 			FPSCounter::StartCounting();
+			glfwPollEvents();
 
-			if (!ImGui::GetCurrentContext()->NavWindow)
+			if (Renderer::IsGraphicalAPI(GraphicalAPI::OPENGL))
+				OpenGLRenderer::RenderTest(glfwManager.GetWindow());
+
+			if (Renderer::IsGraphicalAPI(GraphicalAPI::VULKAN))
 			{
-				//cam movement
-				glm::vec3 dir = glm::vec3(0);
-
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_ESCAPE))
-					break;
-
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
-					dir.y = 1;
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
-					dir.x = -1;
-
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
-					dir.y = -1;
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
-					dir.x = 1;
-
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_Q))
-					dir.z = -1;
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
-					dir.z = 1;
-
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_UP))
-					camSpeed += 10 * FPSCounter::GetDeltaTime();
-				if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
-					camSpeed += -10 * FPSCounter::GetDeltaTime();
-
-				vulkanManager.camPos += dir.y * vulkanManager.camDir * camSpeed * FPSCounter::GetDeltaTime();
-				vulkanManager.camPos += dir.x * glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)) * camSpeed * FPSCounter::GetDeltaTime();
-				vulkanManager.camPos.z += dir.z * camSpeed * FPSCounter::GetDeltaTime();
-
-				// cam rotation
-				double mousePosX, mousePosY;
-				glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
-				glm::vec2 mousePos = glm::vec2(mousePosX, mousePosY);
-
-				glm::vec2 mouseDelta = lastMousePos - mousePos;
-
-				glm::vec3 rot(0);
-				if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
+				if (!ImGui::GetCurrentContext()->NavWindow)
 				{
-					vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.x * lookSpeed * FPSCounter::GetDeltaTime(), glm::vec3(0, 0, 1));
-					vulkanManager.camDir = glm::rotate(vulkanManager.camDir, mouseDelta.y * lookSpeed * FPSCounter::GetDeltaTime(), glm::cross(vulkanManager.camDir, glm::vec3(0, 0, 1)));
+					//cam movement
+					glm::vec3 dir = glm::vec3(0);
+
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_ESCAPE))
+						break;
+
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_W))
+						dir.y = 1;
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_A))
+						dir.x = -1;
+
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_S))
+						dir.y = -1;
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_D))
+						dir.x = 1;
+
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_Q))
+						dir.z = -1;
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_E))
+						dir.z = 1;
+
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_UP))
+						camSpeed += 10 * FPSCounter::GetDeltaTime();
+					if (glfwGetKey(glfwManager.GetWindow(), GLFW_KEY_PAGE_DOWN))
+						camSpeed += -10 * FPSCounter::GetDeltaTime();
+
+					vulkanManager->camPos += dir.y * vulkanManager->camDir * camSpeed * FPSCounter::GetDeltaTime();
+					vulkanManager->camPos += dir.x * glm::cross(vulkanManager->camDir, glm::vec3(0, 0, 1)) * camSpeed * FPSCounter::GetDeltaTime();
+					vulkanManager->camPos.z += dir.z * camSpeed * FPSCounter::GetDeltaTime();
+
+					// cam rotation
+					double mousePosX, mousePosY;
+					glfwGetCursorPos(glfwManager.GetWindow(), &mousePosX, &mousePosY);
+					glm::vec2 mousePos = glm::vec2(mousePosX, mousePosY);
+
+					glm::vec2 mouseDelta = lastMousePos - mousePos;
+
+					glm::vec3 rot(0);
+					if (glfwGetMouseButton(glfwManager.GetWindow(), GLFW_MOUSE_BUTTON_RIGHT))
+					{
+						vulkanManager->camDir = glm::rotate(vulkanManager->camDir, mouseDelta.x * lookSpeed * FPSCounter::GetDeltaTime(), glm::vec3(0, 0, 1));
+						vulkanManager->camDir = glm::rotate(vulkanManager->camDir, mouseDelta.y * lookSpeed * FPSCounter::GetDeltaTime(), glm::cross(vulkanManager->camDir, glm::vec3(0, 0, 1)));
+					}
+
+					lastMousePos = mousePos;
 				}
 
-				lastMousePos = mousePos;
+				vulkanManager->GetImguiStuff()->StartFrame();
+
+				if (Scene::GetCurrentScene() != nullptr)
+					Scene::GetCurrentScene()->Update();
+
+				GUI(vulkanManager);
+
+				vulkanManager->GetImguiStuff()->EndFrame();
+
+				vulkanManager->Present(&glfwManager);
 			}
-
-			vulkanManager.GetImguiStuff()->StartFrame();
-
-			if (Scene::GetCurrentScene() != nullptr)
-				Scene::GetCurrentScene()->Update();
-
-			GUI(&vulkanManager);
-
-			vulkanManager.GetImguiStuff()->EndFrame();
-
-			vulkanManager.Present(&glfwManager);
-
 			FPSCounter::StopCounting();
 		}
-		vulkanManager.WaitForIdle();
+
+		if (Renderer::IsGraphicalAPI(GraphicalAPI::VULKAN))
+			vulkanManager->WaitForIdle();
 
 		Setting::Save();
 	}

@@ -162,6 +162,15 @@
     <ClInclude Include="src\Rendering\Vulkan\VulkanRenderer.h">
       <Filter>Fichiers d%27en-tête\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="src\Rendering\Renderer.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Header\GLFWHeader.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\OpenGL\OpenGLRenderer.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Imgui\imgui.cpp">
@@ -268,6 +277,12 @@
     </ClCompile>
     <ClCompile Include="src\Rendering\Vulkan\VulkanRenderer.cpp">
       <Filter>Fichiers sources\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Renderer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\OpenGL\OpenGLRenderer.cpp">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

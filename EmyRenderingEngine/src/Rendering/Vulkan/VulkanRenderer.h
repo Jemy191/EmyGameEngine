@@ -1,6 +1,5 @@
 #pragma once
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include "Header/GLFWHeader.h"
 
 #include <vector>
 #include <memory>
@@ -22,6 +21,7 @@
 #include "Rendering/GlfwManager.h"
 #include "Rendering/Model.h"
 #include "Game/ImguiStuff.h"
+#include "Rendering/Renderer.h"
 
 class VulkanRenderer
 {

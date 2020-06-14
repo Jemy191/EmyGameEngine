@@ -1,6 +1,5 @@
 #pragma once
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include "Header/GLFWHeader.h"
 
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_stdlib.h"

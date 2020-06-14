@@ -72,16 +72,16 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;USE_OPENGL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)Libraries\glew-2.1.0\include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.2.141.2\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDIr)Libraries\glew-2.1.0\lib\Release\x64;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.2.141.2\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Console|x64'">
@@ -91,16 +91,16 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>DEBUG;CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;CONSOLE;USE_OPENGL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)Libraries\glew-2.1.0\include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.2.141.2\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDIr)Libraries\glew-2.1.0\lib\Release\x64;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.2.141.2\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -112,8 +112,8 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RELEASE;USE_OPENGL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)Libraries\glew-2.1.0\include;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -122,11 +122,14 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.2.141.2\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDIr)Libraries\glew-2.1.0\lib\Release\x64;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.2.141.2\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Rendering\OpenGL\OpenGLRenderer.h" />
+    <ClInclude Include="src\Header\GLFWHeader.h" />
+    <ClInclude Include="src\Rendering\Renderer.h" />
     <ClInclude Include="src\Asset\Asset.h" />
     <ClInclude Include="src\Asset\AssetManager.h" />
     <ClInclude Include="src\Helper\FPSCounter.h" />
@@ -166,6 +169,8 @@
     <ClInclude Include="src\Rendering\Vulkan\VulkanSwapChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Rendering\OpenGL\OpenGLRenderer.cpp" />
+    <ClCompile Include="src\Rendering\Renderer.cpp" />
     <ClCompile Include="src\Asset\Asset.cpp" />
     <ClCompile Include="src\Asset\AssetManager.cpp" />
     <ClCompile Include="src\Helper\FPSCounter.cpp" />

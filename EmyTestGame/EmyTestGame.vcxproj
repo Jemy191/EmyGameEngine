@@ -75,14 +75,14 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)\EmyRenderingEngine\src;$(SolutionDir)Libraries\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;USE_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)\EmyRenderingEngine\src;$(SolutionDir)Libraries\glew-2.1.0\include;$(SolutionDir)Libraries\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>VulkanRenderingEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>EmyRenderingEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Assets" "$(SolutionDir)$(Platform)\$(Configuration)\Assets\" /q /d /s /r /y</Command>
@@ -95,14 +95,14 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>DEBUG;CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)\EmyRenderingEngine\src;$(SolutionDir)Libraries\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;CONSOLE;USE_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)\EmyRenderingEngine\src;$(SolutionDir)Libraries\glew-2.1.0\include;$(SolutionDir)Libraries\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>VulkanRenderingEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>EmyRenderingEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Assets" "$(SolutionDir)$(Platform)\$(Configuration)\Assets\" /q /d /s /r /y</Command>
@@ -117,16 +117,16 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)\EmyRenderingEngine\src;$(SolutionDir)Libraries\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RELEASE;USE_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.141.2\Include;$(SolutionDir)Libraries\glfw-3.3.2.bin.WIN64\include;$(SolutionDir)Libraries\glm;$(SolutionDir)Libraries\SingleFile;$(SolutionDir)\EmyRenderingEngine\src;$(SolutionDir)Libraries\glew-2.1.0\include;$(SolutionDir)Libraries\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>VulkanRenderingEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>EmyRenderingEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Assets" "$(SolutionDir)$(Platform)\$(Configuration)\Assets\" /q /d /s /r /y</Command>
