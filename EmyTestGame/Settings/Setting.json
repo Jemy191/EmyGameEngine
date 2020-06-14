@@ -1,4 +1,5 @@
 {
     "EnableValidationLayers": false,
-    "IDCounter": 1
+    "GraphicAPI": "OPENGL",
+    "IDCounter": 0
 }
