@@ -3,6 +3,7 @@
 #include <Rendering/GlfwManager.h>
 #include "Helper/Log.h"
 #include <fstream>
+#include <random>
 
 class OpenGLRenderer : public Renderer
 {
@@ -10,6 +11,8 @@ private:
 	GLuint buffer;
 	GLuint ibo;
 	GLuint shader;
+
+	float timer = 0;
 
 	static std::vector<char> LoadShader(std::string fileName)
 	{

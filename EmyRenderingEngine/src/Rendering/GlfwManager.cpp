@@ -24,6 +24,8 @@ GlfwManager::GlfwManager(int width, int height, std::string windowName)
 		glfwMakeContextCurrent(window);
 		if (glewInit() != GLEW_OK)
 			Logger::Log(ERROR, "Failed to init glew");
+
+		glfwSwapInterval(1);
 	}
 
 	Logger::Log("GLFW manager init");

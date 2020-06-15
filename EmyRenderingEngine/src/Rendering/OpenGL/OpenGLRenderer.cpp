@@ -1,5 +1,6 @@
 #include "OpenGLRenderer.h"
 #include <Rendering\OpenGL\ImguiOpenGL.h>
+#include "Helper/FPSCounter.h"
 
 OpenGLRenderer::OpenGLRenderer(GLFWwindow* window) : Renderer(window)
 {
@@ -52,6 +53,8 @@ OpenGLRenderer::OpenGLRenderer(GLFWwindow* window) : Renderer(window)
 	shader = CreateShader(vertexShader, fragmentShader);
 
 	glUseProgram(shader);
+
+	glUniform4f(1, 0, 0, 0, 1.0f);
 }
 
 OpenGLRenderer::~OpenGLRenderer()
@@ -63,6 +66,11 @@ void OpenGLRenderer::Present(GlfwManager* window)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	timer += FPSCounter::GetDeltaTime() * 4;
+	if (timer > 1)
+		timer = 0;
+
+	glUniform4f(1, timer, timer, timer, 1.0f);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 	dynamic_cast<ImguiOpenGL*>(imgui.get())->Draw();
