@@ -8,6 +8,7 @@ class OpenGLRenderer : public Renderer
 {
 private:
 	GLuint buffer;
+	GLuint ibo;
 	GLuint shader;
 
 	static std::vector<char> LoadShader(std::string fileName)
@@ -79,4 +80,15 @@ public:
 	~OpenGLRenderer();
 
 	void Present(GlfwManager* window) override;
+
+private:
+	void ResizeWindow(GLFWwindow* window);
+
+	static void APIENTRY GLCallback(GLenum source,
+		GLenum type,
+		GLuint id,
+		GLenum severity,
+		GLsizei length,
+		const GLchar* message,
+		const void* userParam);
 };

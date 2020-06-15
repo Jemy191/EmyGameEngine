@@ -9,6 +9,9 @@ GlfwManager::GlfwManager(int width, int height, std::string windowName)
 
 	glfwWindowHint(GLFW_MAXIMIZED, true);
 
+	if (Renderer::IsGraphicalAPI(GraphicalAPI::OPENGL))
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
 	if (Renderer::IsGraphicalAPI(GraphicalAPI::VULKAN))
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
