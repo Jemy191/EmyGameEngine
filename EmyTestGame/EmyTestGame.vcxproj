@@ -17,6 +17,10 @@
   <ItemGroup>
     <ClCompile Include="Src\Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\TutoGL.frag" />
+    <None Include="Assets\Shaders\TutoGL.vert" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{ECDB2317-8DDD-4107-B98B-75107344E572}</ProjectGuid>
