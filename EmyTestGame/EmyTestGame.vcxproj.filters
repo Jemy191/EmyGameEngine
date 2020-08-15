@@ -22,5 +22,6 @@
   <ItemGroup>
     <None Include="Assets\Shaders\TutoGL.vert" />
     <None Include="Assets\Shaders\TutoGL.frag" />
+    <None Include="Tool\LogStyle.css" />
   </ItemGroup>
 </Project>

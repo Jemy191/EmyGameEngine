@@ -11,9 +11,9 @@ std::vector<std::function<void(std::string message, LogSeverity severity)>> Logg
 
 void Logger::Open(std::string name)
 {
-	outputFile = std::ofstream(name + ".Log.html", std::ios_base::out);
+	outputFile = std::ofstream(name + ".html", std::ios_base::out);
 	outputFile << "<head>" << std::endl;
-	outputFile << "<link rel = 'stylesheet' href = 'LogStyle.css'>" << std::endl;
+	outputFile << "<link rel = 'stylesheet' href = 'Tool/LogStyle.css'>" << std::endl;
 	outputFile << "</head>" << std::endl;
 
 	Log("Logger Open.");
